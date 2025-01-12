@@ -2,8 +2,10 @@ const router=require("express").Router();
 const express=require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require("../middleware/auth");
 
 const User = require("../model/User");
+const UserSession  = require("../model/userSession");
 
 
 
@@ -37,8 +39,6 @@ router.post('/signup',async(req,res)=>{
           password: hashedPassword,
           repassword,
           telNo,
-          
-
         });
         
         await newUser.save();
@@ -58,12 +58,6 @@ router.route("/login").post((req,res)=>{
     const email = req.body.email; 
     const password = req.body.password;
 
-    const generateToken=(id)=>{
-      return jwt.sign({id},process.env.JWT_SE,{
-          expiresIn:"1h",
-      });
-    };
-  
     if(email == "" || password == "" ){
         res.json({
             status : "FAILED" , 
@@ -74,17 +68,31 @@ router.route("/login").post((req,res)=>{
         const user=User.findOne({email}).then((user)=>{
             if(user){
                 //user exist
-  const hashedPassword = user.password;
+                const hashedPassword = user.password;
                 bcrypt.compare(password,hashedPassword).then((result)=>{
                     if(result){
+                      //generate token 
+                      const token = jwt.sign(
+                        {
+                           userName: `${user.fristName} ${user.lastName}`,
+                           userId: user._id,
+                           email: user.email,
+                        },
+                        process.env.JWT_SECRET
+                      );
+                      //create user session
+                      const session = new UserSession({
+                        userId: user._id,
+                        token
+                      })
+                      session.save()
                         res.json({
                           _id:user._id,
                           email:user.email,
                           fristName:user.fristName,
                           lastName:user.lastName,
                           designation:user.designation,
-                          token:generateToken(user._id)
-                          
+                          token,
                         });
                         
                     }else{
@@ -93,7 +101,8 @@ router.route("/login").post((req,res)=>{
                             message: "Invalied password"
                         });
                     }
-                }).catch(()=>{
+                }).catch((err)=>{
+                  console.log(err);
                     res.json({
                         status : "FAILED" , 
                         message: "An error occurred while comparing"
@@ -118,10 +127,16 @@ router.route("/login").post((req,res)=>{
   })
 
 // all user data read
-router.get('/users', async (req, res) => {
+router.get('/users', auth, async (req, res) => {
     try {
-      const users = await User.find();
-      res.json(users);
+      const users = await User.find().lean();
+      const formatedUsers =  users.map((user) => {
+        const {password, ...rest } = user
+        return {
+          ...rest
+        }
+      })
+      res.json(formatedUsers);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -129,9 +144,12 @@ router.get('/users', async (req, res) => {
   });
 
   // delete user using id
-  router.delete('/usersdelete/:id', async (req, res) => {
+  router.delete('/usersdelete/:id', auth, async (req, res) => {
     try {
       const userId = req.params.id;
+      if(!userId){
+        return res.status(200).json({ message: 'User id is required' });
+      }
       const user = await User.findByIdAndDelete(userId);
   
       if (!user) {
@@ -146,7 +164,7 @@ router.get('/users', async (req, res) => {
   });
   
   // update user using id
-  router.put('/update/:id', async (req, res) => {
+  router.put('/update/:id', auth, async (req, res) => {
     const userId = req.params.id;
     const updateduser = req.body;
   

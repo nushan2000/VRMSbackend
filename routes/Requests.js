@@ -3,13 +3,14 @@ const admin = require('firebase-admin');
 const Request = require("../model/Request");
 const Vehicle = require("../model/Vehicle");
 const { requestCollection } = require('../config');
+const auth = require("../middleware/auth");
 
 // Initialize Firebase Admin SDK
 
 
 
 // Add a new request
-router.post("/addrequest", async (req, res) => {
+router.post("/addrequest", auth, async (req, res) => {
     try {
         const {
             date,
@@ -94,7 +95,7 @@ router.post("/addrequest", async (req, res) => {
 });
 
 // Get all requests
-router.get("/requests", async (req, res) => {
+router.get("/requests", auth, async (req, res) => {
     try {
         const requests = await Request.find();
         res.json(requests);
@@ -105,7 +106,7 @@ router.get("/requests", async (req, res) => {
 });
 
 // Get a single request by ID
-router.get("/viewRequest/:id", async (req, res) => {
+router.get("/viewRequest/:id", auth, async (req, res) => {
     const requestId = req.params.id;
 
     try {
@@ -123,7 +124,7 @@ router.get("/viewRequest/:id", async (req, res) => {
 
 
 // Update a request by ID
-router.put("/updateRequest1/:id", async (req, res) => {
+router.put("/updateRequest1/:id", auth, async (req, res) => {
     const requestId = req.params.id;
     const requestData = req.body;
 

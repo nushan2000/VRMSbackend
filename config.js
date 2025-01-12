@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 const { initializeApp, credential, messaging } = require('firebase-admin');
-const serviceAccount = require('../BACKEND/firebase-admin-key.json');
+const serviceAccount = require('./firebase-admin-key.json');
 
 // Initialize Firebase Admin SDK with the service account key
 admin.initializeApp({
