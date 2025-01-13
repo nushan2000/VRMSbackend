@@ -120,16 +120,20 @@ router.route("/login").post((req,res)=>{
                 message: "An error occurred while checking for existing user"
             });
         })
-  
-  
-    }
+      }
   
   })
 
 // all user data read
 router.get('/users', auth, async (req, res) => {
+  const {designation} = req.query; 
     try {
-      const users = await User.find().lean();
+      let users
+      if (designation){
+        users = await User.find({designation}).lean();
+      } else {
+        users = await User.find().lean();
+      }
       const formatedUsers =  users.map((user) => {
         const {password, ...rest } = user
         return {
@@ -181,6 +185,19 @@ router.get('/users', auth, async (req, res) => {
       return res.status(500).json({ message: 'Server error' });
     }
   });
+
+  router.get('/drivers', auth, async (req, res) => {
+      try {
+        const user = await User.findOne({
+          _id: req.query.userId,
+          designation: "driver"
+        }).select('-_id -password').lean();
+        res.json(user);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+    });
 //all functions are working
 
 module.exports=router;

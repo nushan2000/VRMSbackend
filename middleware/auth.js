@@ -38,11 +38,6 @@ const auth = (req, res, next) => {
          const timeDifference = (currentTime - lastActivityTime) / (1000 * 60); // Difference in minutes
          const sessionExpirationTime = 45; // Session expiration time in minutes
          if (timeDifference > sessionExpirationTime) {
-            // remove device ID and pushId from user
-            const inputs = { pushId: "", deviceId: "" };
-            const filters = { _id: user.userId };
-            await PlatformUser.findOneAndUpdate(filters, inputs);
-
             session.isActive = false;
             await session.save();
             return res.status(401).json({
