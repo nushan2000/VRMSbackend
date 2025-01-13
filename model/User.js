@@ -6,23 +6,19 @@ const userSchema= new Schema({
     fristName : {
         type:String,
         require:true
-
     },
 
     lastName :{
         type: String,
         require:true
-        
     },
     email :{
         type: String,
         require:true
-        
     },
     department:{
         type: String,
         require : true
-
     },
     password:{
         type: String,
@@ -31,27 +27,24 @@ const userSchema= new Schema({
     repassword:{
         type : String,
         require: true,
-        
-        
     },
     designation :{
         type: String,
         require : true
     },
-
     telNo:{
         type: String,
         require : true
     },
-
     userImg:{
-
         data:Buffer,
         contentType: String
-        
+    },
+    vehicleId: {
+        type: Schema.Types.ObjectId,
+        ref: "Vehicle"
     }
-
-})
+ })
 
 const User=mongoose.model("User",userSchema);
 
