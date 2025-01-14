@@ -84,6 +84,7 @@ const locationDetail = require("./routes/LocationTrackers.js")
 const availableSeats = require("./routes/availableSheats.js")
 const cost = require('./routes/CostCalculations');
 const feedbackRouter = require("./routes/Feedbacks.js");
+const driverRouter = require("./routes/driver.js");
 
 app.use("/availableSeats",availableSeats)
 app.use("/request",requestRouter);
@@ -92,6 +93,7 @@ app.use("/vehicle",vehicleRouter);
 app.use("/location-details",locationDetail)
 app.use('/costDetails', cost);
 app.use("/user/feedback",feedbackRouter);
+app.use("/driver",driverRouter);
 
 app.listen(PORT1,()=>{
     console.log('server is up and running no port '+PORT1);
