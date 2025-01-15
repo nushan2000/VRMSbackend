@@ -18,7 +18,7 @@ router.post("/addrequest", auth, async (req, res) => {
             reason,
             vehicle,
             section,
-            departureLocation,
+            depatureLocation,
             destination,
             comeBack,
             distance,
@@ -40,13 +40,13 @@ router.post("/addrequest", auth, async (req, res) => {
             reason,
             vehicle,
             section,
-            departureLocation,
+            depatureLocation,
             destination,
             comeBack,
             distance,
             passengers,
-            approveHead: false,
-            approveDeenAr: false,
+            approveHead,
+            approveDeenAr,
             applier: req.user.userId,
             applyDate,
             driverStatus: "notStart"
@@ -56,8 +56,8 @@ router.post("/addrequest", auth, async (req, res) => {
         const savedRequest = await newRequest.save();
 
         // Use the MongoDB ID as the Firestore document ID
-       // const firestoreDocId = savedRequest._id.toString();
-       // const firestoreDocRef = requestCollection.doc(firestoreDocId);
+        // const firestoreDocId = savedRequest._id.toString();
+        // const firestoreDocRef = requestCollection.doc(firestoreDocId);
 
         // Save request data to Firestore
         // await firestoreDocRef.set({
@@ -80,7 +80,7 @@ router.post("/addrequest", auth, async (req, res) => {
         //     driverStatus: "notStart"
         // });
 
-       
+
 
         // Respond with success message and new request object
         res.json({ status: "ok", newRequest: savedRequest });
@@ -116,7 +116,81 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+//get vehicles according to date
+router.get("/RequestVehicles/:date", async (req, res) => {
+    const requestDate = req.params.date;
 
+    try {
+       
+        const requests = await Request.find({ date: requestDate, approveDeenAr: true });
+        const allVehicles = await Vehicle.find();
+        // if (!requests || requests.length === 0) {
+        //     return res.json(allVehicles);
+
+        // }
+
+       
+        const groupedData = requests.reduce((acc, request) => {
+            const vehicleName = request.vehicle;
+            const passengerCount = request.passengers.length;
+            
+
+            if (!acc[vehicleName]) {
+                acc[vehicleName] = {
+                    vehicleName,
+                    totalPassengers: 0,
+                    
+                };
+            }
+            acc[vehicleName].totalPassengers += passengerCount;
+            return acc;
+        }, {});
+
+
+        
+        const groupedArray = Object.values(groupedData);
+        console.log(groupedArray);
+       
+        const vehicleNames = groupedArray.map(v => v.vehicleName);
+        console.log(vehicleNames);
+
+        const vehicles = await Vehicle.find({ vehicleName: { $in: vehicleNames } });
+        //console.log(vehicles);
+
+       
+        const finalDat = groupedArray.map(group => {
+            const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
+            return {
+                vehicleName: group.vehicleName,
+                totalPassengers: group.totalPassengers,
+                maxCapacity: vehicle ? vehicle.sheatCapacity : "Unknown", // Use sheatCapacity from Vehicle
+                availableSeats: vehicle
+                    ? vehicle.sheatCapacity - group.totalPassengers
+                    : "Unknown", // Calculate available seats
+                status: vehicle ? vehicle.status : "Unknown", // Include vehicle status
+                availability: vehicle ? vehicle.availability : "Unknown", // Include availability
+            };
+        });
+        const finalData = allVehicles.map(vehicle => {
+            // Find the matching grouped data for this vehicle
+            const grouped = groupedArray.find(g => g.vehicleName === vehicle.vehicleName);
+
+            return {
+                vehicleName: vehicle.vehicleName,
+                totalPassengers: grouped ? grouped.totalPassengers : 0,
+                maxCapacity: vehicle.sheatCapacity, // Use sheatCapacity from Vehicle
+                availableSeats: vehicle.sheatCapacity - (grouped ? grouped.totalPassengers : 0),
+                status: vehicle.status, // Include vehicle status
+                availability: vehicle.availability, // Include availability
+            };
+        });
+
+        res.json(finalData);
+    } catch (err) {
+        console.error("Error fetching requests: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 
 // Update a request by ID
