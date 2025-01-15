@@ -565,6 +565,103 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get passengers to download",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/request/getPassengers?requestId=67850e83ce07bd8414cda508",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"getPassengers"
+							],
+							"query": [
+								{
+									"key": "requestId",
+									"value": "67850e83ce07bd8414cda508"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/request/getPassengers?requestId=67850e83ce07bd8414cda508",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"request",
+										"getPassengers"
+									],
+									"query": [
+										{
+											"key": "requestId",
+											"value": "67850e83ce07bd8414cda508"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "126"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"7e-+apMmL7Et2JpLzEm8Ht1bJ5XmUU\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Jan 2025 03:33:08 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"Password123\",\n        \"position\": \"Password123\",\n        \"pickup\": \"Password123\",\n        \"drop\": \"Password123\",\n        \"_id\": \"6785121be67de4d43da3ae0a\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all requests",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			]
 		},
