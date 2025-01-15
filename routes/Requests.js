@@ -18,7 +18,7 @@ router.post("/addrequest", async (req, res) => {
             reason,
             vehicle,
             section,
-            departureLocation,
+            depatureLocation,
             destination,
             comeBack,
             distance,
@@ -43,13 +43,13 @@ router.post("/addrequest", async (req, res) => {
             reason,
             vehicle,
             section,
-            departureLocation,
+            depatureLocation,
             destination,
             comeBack,
             distance,
             passengers,
-            approveHead: false,
-            approveDeenAr: false,
+            approveHead,
+            approveDeenAr,
             applier,
             applyDate,
             driverStatus: "notStart"
@@ -59,8 +59,8 @@ router.post("/addrequest", async (req, res) => {
         const savedRequest = await newRequest.save();
 
         // Use the MongoDB ID as the Firestore document ID
-       // const firestoreDocId = savedRequest._id.toString();
-       // const firestoreDocRef = requestCollection.doc(firestoreDocId);
+        // const firestoreDocId = savedRequest._id.toString();
+        // const firestoreDocRef = requestCollection.doc(firestoreDocId);
 
         // Save request data to Firestore
         // await firestoreDocRef.set({
@@ -83,7 +83,7 @@ router.post("/addrequest", async (req, res) => {
         //     driverStatus: "notStart"
         // });
 
-       
+
 
         // Respond with success message and new request object
         res.json({ status: "ok", newRequest: savedRequest });
@@ -119,7 +119,81 @@ router.get("/viewRequest/:id", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+//get vehicles according to date
+router.get("/RequestVehicles/:date", async (req, res) => {
+    const requestDate = req.params.date;
 
+    try {
+       
+        const requests = await Request.find({ date: requestDate, approveDeenAr: true });
+        const allVehicles = await Vehicle.find();
+        // if (!requests || requests.length === 0) {
+        //     return res.json(allVehicles);
+
+        // }
+
+       
+        const groupedData = requests.reduce((acc, request) => {
+            const vehicleName = request.vehicle;
+            const passengerCount = request.passengers.length;
+            
+
+            if (!acc[vehicleName]) {
+                acc[vehicleName] = {
+                    vehicleName,
+                    totalPassengers: 0,
+                    
+                };
+            }
+            acc[vehicleName].totalPassengers += passengerCount;
+            return acc;
+        }, {});
+
+
+        
+        const groupedArray = Object.values(groupedData);
+        console.log(groupedArray);
+       
+        const vehicleNames = groupedArray.map(v => v.vehicleName);
+        console.log(vehicleNames);
+
+        const vehicles = await Vehicle.find({ vehicleName: { $in: vehicleNames } });
+        //console.log(vehicles);
+
+       
+        const finalDat = groupedArray.map(group => {
+            const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
+            return {
+                vehicleName: group.vehicleName,
+                totalPassengers: group.totalPassengers,
+                maxCapacity: vehicle ? vehicle.sheatCapacity : "Unknown", // Use sheatCapacity from Vehicle
+                availableSeats: vehicle
+                    ? vehicle.sheatCapacity - group.totalPassengers
+                    : "Unknown", // Calculate available seats
+                status: vehicle ? vehicle.status : "Unknown", // Include vehicle status
+                availability: vehicle ? vehicle.availability : "Unknown", // Include availability
+            };
+        });
+        const finalData = allVehicles.map(vehicle => {
+            // Find the matching grouped data for this vehicle
+            const grouped = groupedArray.find(g => g.vehicleName === vehicle.vehicleName);
+
+            return {
+                vehicleName: vehicle.vehicleName,
+                totalPassengers: grouped ? grouped.totalPassengers : 0,
+                maxCapacity: vehicle.sheatCapacity, // Use sheatCapacity from Vehicle
+                availableSeats: vehicle.sheatCapacity - (grouped ? grouped.totalPassengers : 0),
+                status: vehicle.status, // Include vehicle status
+                availability: vehicle.availability, // Include availability
+            };
+        });
+
+        res.json(finalData);
+    } catch (err) {
+        console.error("Error fetching requests: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 
 // Update a request by ID
@@ -146,32 +220,32 @@ router.put("/updateRequest1/:id", async (req, res) => {
         console.log(`Request with ID ${requestId} updated successfully`);
 
         // Send FCM notification if approveDeenAr is being updated to true
-       
-            const vehicle = await Vehicle.findOne({ vehicleName: existingRequest.vehicle });
 
-            if (!vehicle) {
-                console.log(`Vehicle not found for request ID ${requestId}`);
-                throw new Error('Vehicle not found for the reservation');
-            }
+        const vehicle = await Vehicle.findOne({ vehicleName: existingRequest.vehicle });
 
-            console.log(`Sending notification to driver (${vehicle.driverName})`);
+        if (!vehicle) {
+            console.log(`Vehicle not found for request ID ${requestId}`);
+            throw new Error('Vehicle not found for the reservation');
+        }
 
-            const message = {
-                data: {
-                    title: 'New Reservation',
-                    body: 'A new reservation has been added.',
-                    // You can add more custom data to be sent with the notification
-                },
-                topic: 'drivers', // The topic to which drivers are subscribed
-            };
+        console.log(`Sending notification to driver (${vehicle.driverName})`);
 
-            const response = await admin.messaging().send(message);
+        const message = {
+            data: {
+                title: 'New Reservation',
+                body: 'A new reservation has been added.',
+                // You can add more custom data to be sent with the notification
+            },
+            topic: 'drivers', // The topic to which drivers are subscribed
+        };
+
+        const response = await admin.messaging().send(message);
 
         // Handle response if needed
-            console.log('FCM notification sent:', response);
+        console.log('FCM notification sent:', response);
 
-            console.log(`Notification sent to driver (${vehicle.driverName})`);
-       
+        console.log(`Notification sent to driver (${vehicle.driverName})`);
+
 
         // Update Firestore (if needed)
         const requestDocRef = requestCollection.doc(requestId);
