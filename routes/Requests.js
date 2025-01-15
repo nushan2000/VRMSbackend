@@ -212,6 +212,20 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
   }
 });
 
+router.get("/getPassengers", auth, async (req, res) => {
+  const requestId = req.query.requestId;
+  try {
+      const request = await Request.findById(requestId);
+      if (!request) {
+          return res.status(404).json({ message: "Request not found" });
+      }
+      res.json(request.passengers);
+  } catch (err) {
+      console.error("Error fetching request: ", err);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
 
 
