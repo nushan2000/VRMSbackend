@@ -1,73 +1,69 @@
 const router=require("express").Router();
 const express=require('express');
 const bodyParser = require('body-parser');
-
+const auth = require("../middleware/auth");
 const Vehicle = require("../model/Vehicle");
+const Driver = require("../model/Driver");
 const {vehicleCollection}=require('../config')
-
 const app =express()
 const path=require('path')  
-
 app.use(bodyParser.json({ limit: '1000mb' })); // Adjust the limit based on your needs
 app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' })); // Adjust the limit based on your needs
 
 //add vehicle
-
-
-
-
-
-router.route("/addVehicle").post(async(req,res)=>{
+router.route("/addVehicle", auth).post(async(req,res)=>{
     let vehicleNo=req.body.vehicleNo;
     let vehicleType=req.body.vehicleType;
     let sheatCapacity=req.body.sheatCapacity;
-    
-    let driverName=req.body.driverName;
-    
-   
     let {vehicleImg} =req.body;
-    let driverEmail=req.body.driverEmail;
     let vehicleName=req.body.vehicleName;
+    let driverId = req.body.driverId;
     
     try{
-      Vehicle.create({         
-        vehicleNo,
+       const cteratedVehicle = Vehicle.create({         
         vehicleNo,
         vehicleType,
         sheatCapacity, 
         avilableSheat: sheatCapacity,       
-        driverName,
         status:"yes",
         availability: 'yes',
         vehicleImg,
-        driverEmail,
-        vehicleName
+        vehicleName,
+        driverId,
       })
 
         await vehicleCollection.doc(vehicleNo).set({
           vehicleNo,
           vehicleType,
           sheatCapacity,         
-          driverName,       
-          driverEmail,
           vehicleName,
           status:"yes",
-        availability: 'yes',
-        avilableSheat: sheatCapacity, 
-        vehicleImg,
+          availability: 'yes',
+          avilableSheat: sheatCapacity, 
+          vehicleImg,
+          driverId,
         }); 
 
-       
+        //update driver profile
+        if(driverId){
+          const updatedDriver = await Driver.findByIdAndUpdate(
+            {
+              _id: driverId
+            },
+            {
+              vehicleId: cteratedVehicle._id 
+            }
+          )
+          if(!updatedDriver) {
+            return res.status(200).json({ message: 'Update driver prifile failed' });
+          }
+        }
     }catch(error){
       console.error(error.message)
     }
-    
-
-
-    
 })
 
-router.post('/vehicle/:id/addStatusDate', async (req, res) => {
+router.post('/vehicle/:id/addStatusDate', auth,  async (req, res) => {
   const vehicleId = req.params.id;
   const { date } = req.body;
 
@@ -89,7 +85,7 @@ router.post('/vehicle/:id/addStatusDate', async (req, res) => {
   }
 });
 //read all vehicles
-router.get('/vehicles', async (req, res) => {
+router.get('/vehicles', auth, async (req, res) => {
     try {
       const vehicles = await Vehicle.find();
       res.json(vehicles);
@@ -100,7 +96,7 @@ router.get('/vehicles', async (req, res) => {
   });
 
   //delete vehicle by id
-  router.delete('/vehiclesdelete/:id', async (req, res) => {
+  router.delete('/vehiclesdelete/:id', auth, async (req, res) => {
     try {
       const vehicleId = req.params.id;
       const vehicle = await Vehicle.findByIdAndDelete(vehicleId);
@@ -118,7 +114,7 @@ router.get('/vehicles', async (req, res) => {
   
   
   //update vehicle by id
-  router.put('/updateVeh/:id', async (req, res) => {
+  router.put('/updateVeh/:id', auth, async (req, res) => {
     const vehicleId = req.params.id;
     const updatedVehicle = req.body;
   
@@ -140,6 +136,7 @@ router.get('/vehicles', async (req, res) => {
             status: updatedVehicle.status,
             vehicleImg: updatedVehicle.vehicleImg,
             statusList: updatedVehicle.statusList, // Explicitly set statusList
+            driverId: updatedVehicle.driverId,
         } },
         { new: true, runValidators: true }
       );
@@ -149,6 +146,20 @@ router.get('/vehicles', async (req, res) => {
       }
   
       console.log("Vehicle after update:", vehicle); // Debug: log the vehicle after update
+
+      //update driver profile
+      const updatedDriver = await Driver.findByIdAndUpdate(
+        {
+          _id: updatedVehicle.driverId
+        },
+        {
+          vehicleId 
+        }
+      )
+
+      if(!updatedDriver) {
+        return res.status(404).json({ message: 'Update driver prifile failed' });
+      }
   
       return res.status(200).json({ message: 'Vehicle updated successfully', vehicle });
     } catch (error) {

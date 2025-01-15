@@ -2,12 +2,11 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const userSchema= new Schema({
+const driverSchema= new Schema({
     fristName : {
         type:String,
         require:true
     },
-
     lastName :{
         type: String,
         require:true
@@ -15,10 +14,6 @@ const userSchema= new Schema({
     email :{
         type: String,
         require:true
-    },
-    department:{
-        type: String,
-        require : true
     },
     password:{
         type: String,
@@ -28,10 +23,6 @@ const userSchema= new Schema({
         type : String,
         require: true,
     },
-    designation :{
-        type: String,
-        require : true
-    },
     telNo:{
         type: String,
         require : true
@@ -40,8 +31,12 @@ const userSchema= new Schema({
         data:Buffer,
         contentType: String
     },
+    vehicleId: {
+        type: Schema.Types.ObjectId,
+        ref: "Vehicle"
+    }
  })
 
-const User=mongoose.model("User",userSchema);
+const User=mongoose.model("Driver",driverSchema);
 
 module.exports=User;
