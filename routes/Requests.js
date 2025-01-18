@@ -6,6 +6,7 @@ const { requestCollection } = require('../config');
 const auth = require("../middleware/auth");
 const { requestApprovedEmail } = require('../utills/emailTemplate');
 const EmailService = require("../Services/email-service");
+const mongoose = require('mongoose');
 
 const emailService = new EmailService();
 // Add a new request
@@ -303,6 +304,7 @@ router.get("/getPassengers", auth, async (req, res) => {
 // Get all requests
 router.get("/requests-mobile", auth, async (req, res) => {
     const {vehicleId, driverStatus} = req.query
+    console.log(typeof(vehicleId), driverStatus);
     try {
         if(!vehicleId || !driverStatus){
             const missingFields = [];
@@ -315,14 +317,19 @@ router.get("/requests-mobile", auth, async (req, res) => {
             const errorMessage = `Required fields are missing : ${missingFields.join(", ")}`
             return res.status(200).json({message: errorMessage}); 
         }
+        const vehicleObjectId = new mongoose.Types.ObjectId(vehicleId);
+        console.log(typeof(vehicleObjectId))
         const requests = await Request.find({
             vehicle: vehicleId,
-            driverStatus,
-            approveDeenAr: true,
+            driverStatus:driverStatus,
+            approveHead: true,
+            approveDeenAr:true
         });
 
+        console.log(requests)
+
         if(requests.length == 0){
-            res.json({requests: []});
+           return res.json({requests: []});
         }
         const formatedRequests = requests.map((request) => {
             return{
