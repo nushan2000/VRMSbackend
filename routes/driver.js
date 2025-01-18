@@ -81,7 +81,7 @@ router.route("/login").post((req,res)=>{
         });
     }else {
         //checking exist user
-        const user=Driver.findOne({email}).populate({path: "vehicleId", select: "vehicleNo vehicleImg status availability sheatCapacity"}).lean().then((user)=>{
+        const user= Driver.findOne({email}).lean().then((user)=>{
             if(user){
                 //user exist
                 const hashedPassword = user.password;
@@ -196,6 +196,34 @@ router.get('/all', auth, async (req, res) => {
       }
   
       return res.status(200).json({ message: 'user updated successfully', user });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // driver auth
+  router.get('/auth', auth, async (req, res) => {
+    const userId = req.user.userId;
+    try {
+      const user= await Driver.findOne({_id: userId}).populate({path: "vehicleId", select: "vehicleNo vehicleImg status availability sheatCapacity"}).lean();
+  
+      if (!user) {
+        return res.status(404).json({ message: 'user not found' });
+      }
+        return res.json({
+          _id:user._id,
+          email:user.email,
+          fristName:user.fristName,
+          lastName:user.lastName,
+          designation:user.designation,
+          propilePic: user.userImg,
+          vehicleNo: user.vehicleId?.vehicleNo,
+          vehicleImg: user.vehicleId?.vehicleImg,
+          vehicleStatus: user.vehicleId?.status,
+          availability: user.vehicleId?.availability,
+          sheatCapacity: user.vehicleId?.sheatCapacity,
+        });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Server error' });
