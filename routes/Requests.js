@@ -6,6 +6,7 @@ const { requestCollection } = require('../config');
 const auth = require("../middleware/auth");
 const { requestApprovedEmail } = require('../utills/emailTemplate');
 const EmailService = require("../Services/email-service");
+const mongoose = require('mongoose');
 
 const emailService = new EmailService();
 // Add a new request
@@ -303,6 +304,7 @@ router.get("/getPassengers", auth, async (req, res) => {
 // Get all requests
 router.get("/requests-mobile", auth, async (req, res) => {
     const {vehicleId, driverStatus} = req.query
+    console.log(typeof(vehicleId), driverStatus);
     try {
         if(!vehicleId || !driverStatus){
             const missingFields = [];
@@ -315,14 +317,19 @@ router.get("/requests-mobile", auth, async (req, res) => {
             const errorMessage = `Required fields are missing : ${missingFields.join(", ")}`
             return res.status(200).json({message: errorMessage}); 
         }
+        const vehicleObjectId = new mongoose.Types.ObjectId(vehicleId);
+        console.log(typeof(vehicleObjectId))
         const requests = await Request.find({
             vehicle: vehicleId,
-            driverStatus,
-            approveDeenAr: true,
+            driverStatus:driverStatus,
+            approveHead: true,
+            approveDeenAr:true
         });
 
+        console.log(requests)
+
         if(requests.length == 0){
-            res.json({requests: []});
+           return res.json({requests: []});
         }
         const formatedRequests = requests.map((request) => {
             return{
@@ -341,6 +348,44 @@ router.get("/requests-mobile", auth, async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+// Update a request by ID
+router.patch("/update-request-driver-status", auth, async (req, res) => {
+    const requestId = req.body.requestId;
+    const driverStatus = req.body.driverStatus;
+    try {
+        if(!requestId || !driverStatus){
+            const missingFields = [];
+            if(!requestId){
+                missingFields.push("vehicleId")
+            }
+            if(!driverStatus){
+                missingFields.push("driverStatus")
+            }
+            const errorMessage = `Required fields are missing : ${missingFields.join(", ")}`
+            return res.status(200).json({message: errorMessage}); 
+        }
+      console.log(`Updating request with ID: ${requestId}`);
+      // Find and update the request in MongoDB
+      const existingRequest = await Request.findOneAndUpdate(
+        {_id: requestId},
+        {driverStatus},
+        { new: true }
+      );
+      if (!existingRequest) {
+        console.log(`Request with ID ${requestId} not found`);
+        return res.status(404).json({ message: "Request not found" });
+      }
+  
+      console.log(`Request with ID ${requestId} updated successfully`);
+
+      // Respond with success message and updated request object
+      res.json({ status: "ok", updatedRequest: existingRequest });
+    } catch (error) {
+      console.error("Error occurred: ", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
 
 module.exports = router;
 
