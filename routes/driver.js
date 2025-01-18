@@ -218,6 +218,7 @@ router.get('/all', auth, async (req, res) => {
           lastName:user.lastName,
           designation:user.designation,
           propilePic: user.userImg,
+          vehicleId: user.vehicleId?._id,
           vehicleNo: user.vehicleId?.vehicleNo,
           vehicleImg: user.vehicleId?.vehicleImg,
           vehicleStatus: user.vehicleId?.status,
