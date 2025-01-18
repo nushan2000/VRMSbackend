@@ -85,7 +85,7 @@ router.post('/vehicle/:id/addStatusDate', auth,  async (req, res) => {
   }
 });
 //read all vehicles
-router.get('/vehicles', auth, async (req, res) => {
+router.get('/vehicles', async (req, res) => {
     try {
       const vehicles = await Vehicle.find();
       res.json(vehicles);

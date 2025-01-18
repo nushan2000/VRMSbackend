@@ -300,6 +300,44 @@ router.get("/getPassengers", auth, async (req, res) => {
   }
 });
 
+// Get all requests
+router.get("/requests-mobile", auth, async (req, res) => {
+    const {vehicleId, driverStatus} = req.query
+    try {
+        if(!vehicleId || !driverStatus){
+            const missingFields = [];
+            if(!vehicleId){
+                missingFields.push("vehicleId")
+            }
+            if(!driverStatus){
+                missingFields.push("driverStatus")
+            }
+            const errorMessage = `Required fields are missing : ${missingFields.join(", ")}`
+            return res.status(200).json({message: errorMessage}); 
+        }
+        const requests = await Request.find({
+            vehicle: vehicleId,
+            driverStatus,
+        });
+
+        const formatedRequests = requests.map((request) => {
+            return{
+                requestId: request._id,
+                date: request.date,
+                startTime: request.startTime,
+                passengerCount : request.passengers.length,
+                from: request.depatureLocation,
+                to: request.destination,
+                status: request.driverStatus,
+            }
+        }) 
+        res.json({requests: formatedRequests});
+    } catch (err) {
+        console.error("Error fetching requests: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 module.exports = router;
 
 
