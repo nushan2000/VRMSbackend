@@ -318,8 +318,12 @@ router.get("/requests-mobile", auth, async (req, res) => {
         const requests = await Request.find({
             vehicle: vehicleId,
             driverStatus,
+            approveDeenAr: true,
         });
 
+        if(requests.length == 0){
+            res.json({requests: []});
+        }
         const formatedRequests = requests.map((request) => {
             return{
                 requestId: request._id,
