@@ -33,8 +33,7 @@ const requestSchema= new Schema({
         require : true
     },
     vehicle:{
-        type: Schema.Types.ObjectId,
-        ref: "Vehicle",
+        type: String,
         require : true
     },
     depatureLocation:{
