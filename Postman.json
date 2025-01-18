@@ -662,6 +662,105 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "Get request Mobile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/request/requests-mobile?vehicleId=67850b5611ae88be6ba6febf&driverStatus=notStart",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"requests-mobile"
+							],
+							"query": [
+								{
+									"key": "vehicleId",
+									"value": "67850b5611ae88be6ba6febf"
+								},
+								{
+									"key": "driverStatus",
+									"value": "notStart",
+									"description": "notStart -> request    onGoing-> ongoing request  "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/request/requests-mobile?vehicleId=67850b5611ae88be6ba6febf&driverStatus=notStart",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"request",
+										"requests-mobile"
+									],
+									"query": [
+										{
+											"key": "vehicleId",
+											"value": "67850b5611ae88be6ba6febf"
+										},
+										{
+											"key": "driverStatus",
+											"value": "notStart",
+											"description": "notStart -> request  "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "332"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"14c-ClkOXNqNcCmQdNh4OdxiocJuobw\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Jan 2025 06:53:18 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"requests\": [\n        {\n            \"requestId\": \"67850e83ce07bd8414cda508\",\n            \"date\": \"2025-01-13T00:00:00.000Z\",\n            \"startTime\": \"Password123\",\n            \"passengerCount\": 1,\n            \"to\": \"Password123\",\n            \"status\": \"notStart\"\n        },\n        {\n            \"requestId\": \"6785100b4904d485a7db3083\",\n            \"date\": \"2025-01-13T00:00:00.000Z\",\n            \"startTime\": \"Password123\",\n            \"passengerCount\": 1,\n            \"to\": \"Password123\",\n            \"status\": \"notStart\"\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		},
@@ -984,12 +1083,27 @@
 				},
 				{
 					"name": "Driver Log in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = JSON.parse(responseBody);\r",
+									"const token = res.token;\r",
+									"\r",
+									"pm.environment.set(\"token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"123568@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
+							"raw": "{\r\n    \"email\": \"email2555@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1351,6 +1465,83 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"message\": \"user updated successfully\",\n    \"user\": {\n        \"_id\": \"6786617556689c1535fcee59\",\n        \"fristName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email2555@gmail.com\",\n        \"password\": \"Password123\",\n        \"repassword\": \"Password123\",\n        \"telNo\": \"telNo\",\n        \"vehicleId\": \"67850b5611ae88be6ba6febf\",\n        \"__v\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Driver auth",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/driver/auth",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"auth"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/driver/auth",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "225"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"e1-UX2dd4lzVhZJnqQGx14HxlxeWqg\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Jan 2025 07:33:45 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"678661f92505542f14ddaa32\",\n    \"email\": \"email2555@gmail.com\",\n    \"fristName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"vehicleNo\": \"BIV-3858\",\n    \"vehicleImg\": \"email@email.com\",\n    \"vehicleStatus\": \"yes\",\n    \"availability\": \"yes\",\n    \"sheatCapacity\": 2\n}"
 						}
 					]
 				}
