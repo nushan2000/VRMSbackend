@@ -349,6 +349,35 @@ router.get("/requests-mobile", auth, async (req, res) => {
     }
 });
 
+router.put('/status/update/:id', auth, async(req, res) => {
+    try{
+        const requestId = req.params.id;
+        const dirverStatus = req.body.driverStatus;
+
+        if(!requestId && !dirverStatus){
+            return status(400).json({error:'missing field'})
+        }
+
+        const request = await Request.findById(requestId);
+
+        if(!request){
+            return status(400).json({error:'no request'})
+        }
+
+        const updateData = {};
+
+        if(dirverStatus){
+            updateData.driverStatus = dirverStatus
+        }
+
+        await request.updateOne(updateData);
+        res.json({requests: updateData.driverStatus});
+    }catch(err){
+        console.error("Error with update: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
 module.exports = router;
 
 
