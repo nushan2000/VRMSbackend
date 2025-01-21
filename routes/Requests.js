@@ -349,43 +349,36 @@ router.get("/requests-mobile", auth, async (req, res) => {
     }
 });
 
-// Update a request by ID
-router.patch("/update-request-driver-status", auth, async (req, res) => {
-    const requestId = req.body.requestId;
-    const driverStatus = req.body.driverStatus;
-    try {
-        if(!requestId || !driverStatus){
-            const missingFields = [];
-            if(!requestId){
-                missingFields.push("vehicleId")
-            }
-            if(!driverStatus){
-                missingFields.push("driverStatus")
-            }
-            const errorMessage = `Required fields are missing : ${missingFields.join(", ")}`
-            return res.status(200).json({message: errorMessage}); 
-        }
-      console.log(`Updating request with ID: ${requestId}`);
-      // Find and update the request in MongoDB
-      const existingRequest = await Request.findOneAndUpdate(
-        {_id: requestId},
-        {driverStatus},
-        { new: true }
-      );
-      if (!existingRequest) {
-        console.log(`Request with ID ${requestId} not found`);
-        return res.status(404).json({ message: "Request not found" });
-      }
-  
-      console.log(`Request with ID ${requestId} updated successfully`);
 
-      // Respond with success message and updated request object
-      res.json({ status: "ok", updatedRequest: existingRequest });
-    } catch (error) {
-      console.error("Error occurred: ", error);
-      res.status(500).json({ error: "Internal Server Error" });
+router.put('/status/update/:id', auth, async(req, res) => {
+    try{
+        const requestId = req.params.id;
+        const dirverStatus = req.body.driverStatus;
+
+        if(!requestId && !dirverStatus){
+            return status(400).json({error:'missing field'})
+        }
+
+        const request = await Request.findById(requestId);
+
+        if(!request){
+            return status(400).json({error:'no request'})
+        }
+
+        const updateData = {};
+
+        if(dirverStatus){
+            updateData.driverStatus = dirverStatus
+        }
+
+        await request.updateOne(updateData);
+        res.json({requests: updateData.driverStatus});
+    }catch(err){
+        console.error("Error with update: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-  });
+})
+
 
 module.exports = router;
 
