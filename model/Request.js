@@ -65,8 +65,8 @@ const requestSchema= new Schema({
         default: "notStart"
     },
     applier :{
-        type: Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
+       
         require:true
     },applyDate :{
         type: Date,

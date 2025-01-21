@@ -48,7 +48,7 @@ router.post("/addrequest", auth, async (req, res) => {
             passengers,
             approveHead,
             approveDeenAr,
-            applier: req.user.userId,
+            applier,
             applyDate,
             driverStatus: "notStart"
         });
