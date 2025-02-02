@@ -2,8 +2,11 @@ const express =require("express");
 const mongoose=require("mongoose");
 const bodyParser=require("body-parser");
 const cors= require("cors");
-const dotenv=require("dotenv")
+const dotenv=require("dotenv");
+const admin = require('firebase-admin');
+const serviceAccount = require('./firebase-admin-key.json');
 const app=express();
+
 require("dotenv").config();
 
 const http = require('http');
@@ -11,10 +14,11 @@ const websocket = require('./webShocket.js');
 
 
 
-
 const server = http.createServer(app);
 
-
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 
 
 const PORT1=process.env.PORT ||8080;

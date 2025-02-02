@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const auth = require("../middleware/auth");
 const Vehicle = require("../model/Vehicle");
 const Driver = require("../model/Driver");
-const {vehicleCollection}=require('../config')
+
 const app =express()
 const path=require('path')  
 app.use(bodyParser.json({ limit: '1000mb' })); // Adjust the limit based on your needs
@@ -32,17 +32,7 @@ router.route("/addVehicle", auth).post(async(req,res)=>{
         driverId,
       })
 
-        await vehicleCollection.doc(vehicleNo).set({
-          vehicleNo,
-          vehicleType,
-          sheatCapacity,         
-          vehicleName,
-          status:"yes",
-          availability: 'yes',
-          avilableSheat: sheatCapacity, 
-          vehicleImg,
-          driverId,
-        }); 
+
 
         //update driver profile
         if(driverId){

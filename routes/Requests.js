@@ -2,7 +2,7 @@ const router = require("express").Router();
 const admin = require('firebase-admin');
 const Request = require("../model/Request");
 const Vehicle = require("../model/Vehicle");
-const { requestCollection } = require('../config');
+const Driver = require("../model/Driver");
 const auth = require("../middleware/auth");
 const { requestApprovedEmail } = require('../utills/emailTemplate');
 const EmailService = require("../Services/email-service");
@@ -378,6 +378,41 @@ router.put('/status/update/:id', auth, async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
+
+
+router.post('/send-notification', async (req, res) => {
+    const driverId = '6788c5a5445816c347bbf2a1';
+    const { title, body } = req.body;
+
+    const driver = await Driver.findById(driverId);
+
+    if(!driver){
+        return res.status(400).json({ error: 'Device not found' });
+    }
+  
+
+
+    const driverToken = driver.mobileAppId;
+    console.log(driverToken)
+    if (!driverToken) {
+        return res.status(400).json({ error: 'Device token is required' });
+    }
+  
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      token:driverToken,
+    };
+  
+    try {
+      await admin.messaging().send(message);
+      res.status(200).json({ success: true, message: 'Notification sent' });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 
 
 module.exports = router;
