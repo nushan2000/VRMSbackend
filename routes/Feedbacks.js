@@ -34,11 +34,12 @@ router.post('/feedback-submit',auth, async(req,res) => {
     }
 })
 
-router.get('/feedbacks', auth, async (req,res) => {
+router.get('/feedbacks', async (req,res) => {
     try{
         const feedbacks = await FeedBack.find();
         res.json(feedbacks);
     } catch (error) {
+        
         console.error(error);
         res.status(500).json({message : 'Internal server error'})
     }

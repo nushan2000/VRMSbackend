@@ -22,6 +22,8 @@ router.post("/addrequest", auth, async (req, res) => {
             depatureLocation,
             destination,
             comeBack,
+            approveHead,
+            approveDeenAr,
             distance,
             passengers,
             applier,
@@ -48,7 +50,7 @@ router.post("/addrequest", auth, async (req, res) => {
             passengers,
             approveHead,
             approveDeenAr,
-            applier: req.user.userId,
+            applier,
             applyDate,
             driverStatus: "notStart"
         });
@@ -92,8 +94,9 @@ router.post("/addrequest", auth, async (req, res) => {
 });
 
 // Get all requests
-router.get("/requests", auth, async (req, res) => {
+router.get("/requests", async (req, res) => {
     try {
+        
         const requests = await Request.find();
         res.json(requests);
     } catch (err) {
@@ -119,22 +122,20 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
 });
 //get vehicles according to date
 router.get("/RequestVehicles/:date", async (req, res) => {
-    const requestDate = req.params.date;
+    
 
     try {
-       
-        const requests = await Request.find({ date: requestDate, approveDeenAr: true });
+        const requestDate = req.params.date;
+        console.log("date",requestDate);
+        const requests = await Request.find({date:requestDate,approveDeenAr: true });
+        console.log("reqes",requests);
+        
         const allVehicles = await Vehicle.find();
-        // if (!requests || requests.length === 0) {
-        //     return res.json(allVehicles);
 
-        // }
 
-       
         const groupedData = requests.reduce((acc, request) => {
             const vehicleName = request.vehicle;
             const passengerCount = request.passengers.length;
-            
 
             if (!acc[vehicleName]) {
                 acc[vehicleName] = {
@@ -143,14 +144,16 @@ router.get("/RequestVehicles/:date", async (req, res) => {
                     
                 };
             }
+
             acc[vehicleName].totalPassengers += passengerCount;
             return acc;
         }, {});
 
 
         
+        
         const groupedArray = Object.values(groupedData);
-        console.log(groupedArray);
+        console.log("array group",groupedArray);
        
         const vehicleNames = groupedArray.map(v => v.vehicleName);
         console.log(vehicleNames);
@@ -159,22 +162,23 @@ router.get("/RequestVehicles/:date", async (req, res) => {
         //console.log(vehicles);
 
        
-        const finalDat = groupedArray.map(group => {
-            const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
-            return {
-                vehicleName: group.vehicleName,
-                totalPassengers: group.totalPassengers,
-                maxCapacity: vehicle ? vehicle.sheatCapacity : "Unknown", // Use sheatCapacity from Vehicle
-                availableSeats: vehicle
-                    ? vehicle.sheatCapacity - group.totalPassengers
-                    : "Unknown", // Calculate available seats
-                status: vehicle ? vehicle.status : "Unknown", // Include vehicle status
-                availability: vehicle ? vehicle.availability : "Unknown", // Include availability
-            };
-        });
+        // const finalDat = groupedArray.map(group => {
+        //     const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
+        //     return {
+        //         vehicleName: group.vehicleName,
+        //         totalPassengers: group.totalPassengers,
+        //         maxCapacity: vehicle ? vehicle.sheatCapacity : "Unknown", // Use sheatCapacity from Vehicle
+        //         availableSeats: vehicle
+        //             ? vehicle.sheatCapacity - group.totalPassengers
+        //             : "Unknown", // Calculate available seats
+        //         status: vehicle ? vehicle.status : "Unknown", // Include vehicle status
+        //         availability: vehicle ? vehicle.availability : "Unknown", // Include availability
+        //     };
+        // });
         const finalData = allVehicles.map(vehicle => {
             // Find the matching grouped data for this vehicle
             const grouped = groupedArray.find(g => g.vehicleName === vehicle.vehicleName);
+console.log("group",grouped);
 
             return {
                 vehicleName: vehicle.vehicleName,

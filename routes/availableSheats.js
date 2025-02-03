@@ -7,7 +7,7 @@ const auth = require("../middleware/auth");
 // Create an Express router
 const router = express.Router();
 
-router.get('/getAvailableSeats',auth, async (req, res) => {
+router.get('/getAvailableSeats', async (req, res) => {
     try {
         const { date, vehicle } = req.query;
 
