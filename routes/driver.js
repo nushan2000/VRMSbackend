@@ -230,6 +230,39 @@ router.get('/all', auth, async (req, res) => {
       return res.status(500).json({ message: 'Server error' });
     }
   });
+
+  router.put('/update/appid/:id', async (req,res) => {
+    try{
+      const mobileAppId = req.body.mobileId;
+      const id = req.params.id;
+
+      const driver = await Driver.findById(id);
+
+      console.log('id',id);
+      console.log('id',mobileAppId)
+
+      if (!driver) {
+        return res.status(404).json({ message: 'driver not found' });
+      }
+
+      if (!mobileAppId) {
+        return res.status(404).json({ message: 'mobile app id not found' });
+      }
+
+      const updateData = {};
+
+      if(mobileAppId){
+        updateData.mobileAppId = mobileAppId
+      }
+
+      await driver.updateOne(updateData);
+
+      return res.status(200).json({ message: 'mobile app id updated successfully', driver });
+    }catch(err){
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  })
 //all functions are working
 
 module.exports=router;

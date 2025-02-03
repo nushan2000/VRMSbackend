@@ -2,7 +2,7 @@ const router = require("express").Router();
 const admin = require('firebase-admin');
 const Request = require("../model/Request");
 const Vehicle = require("../model/Vehicle");
-const { requestCollection } = require('../config');
+const Driver = require("../model/Driver");
 const auth = require("../middleware/auth");
 const { requestApprovedEmail } = require('../utills/emailTemplate');
 const EmailService = require("../Services/email-service");
@@ -241,29 +241,7 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
 
     console.log(`Sending notification to driver (${vehicle.driverName})`);
 
-    // const message = {
-    //   data: {
-    //     title: "New Reservation",
-    //     body: "A new reservation has been added.",
-    //     // You can add more custom data to be sent with the notification
-    //   },
-    //   topic: "drivers", // The topic to which drivers are subscribed
-    // };
 
-    // const response = await admin.messaging().send(message);
-
-    // // Handle response if needed
-    // console.log("FCM notification sent:", response);
-
-    // console.log(`Notification sent to driver (${vehicle.driverName})`);
-
-    // // Update Firestore (if needed)
-    // const requestDocRef = requestCollection.doc(requestId);
-    // await requestDocRef.set(requestData, { merge: true });
-
-    // console.log(`Request data updated in Firestore for ID ${requestId}`);
-
-    //send email to applier
     if(requestData.approveDeenAr){
         const emailDetails = requestApprovedEmail(requestData.destination, requestData.date)
         const { subject, html } = emailDetails;
@@ -280,6 +258,9 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
                data: null,
             };
          }
+
+         const notificationSended = await sendNotification(request.vehicle);
+         console.log(notificationSended);
 
     }
 
@@ -382,6 +363,50 @@ router.put('/status/update/:id', auth, async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
+
+
+const sendNotification = async (vehicleId) => {
+
+    if (mongoose.Types.ObjectId.isValid(vehicleId)) {
+        const objectId = new mongoose.Types.ObjectId(vehicleId);
+        console.log(objectId); 
+    } else {
+        console.log("Invalid vehicleId");
+    }
+
+    const driverDriverDetails = await Driver.findOne({vehicleId:objectId});
+    const title = 'vidusha';
+    const body = 'run';
+
+    
+
+    if(!driverDriverDetails){
+        return res.status(400).json({ error: 'Device not found' });
+    }
+  
+
+
+    const driverToken = driverDriverDetails.mobileAppId;
+    console.log(driverToken)
+    if (!driverToken) {
+        return res.status(400).json({ error: 'Device token is required' });
+    }
+  
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      token:driverToken,
+    };
+  
+    try {
+      await admin.messaging().send(message);
+      res.status(200).json({ success: true, message: 'Notification sent' });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  };
 
 
 module.exports = router;

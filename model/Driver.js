@@ -34,6 +34,10 @@ const driverSchema= new Schema({
     vehicleId: {
         type: Schema.Types.ObjectId,
         ref: "Vehicle"
+    },
+    mobileAppId: {
+        type:String,
+        require:false
     }
  })
 
