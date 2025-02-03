@@ -42,40 +42,39 @@ connection.once('open', () => {
 })
 
 
-function authenticateToken(req, res, next) {
+// function authenticateToken(req, res, next) {
 
-    const requestPath = req.originalUrl;
+//     const requestPath = req.originalUrl;
 
-    if (requestPath === "/user/login") {
-        return next();
-    }
+//     if (requestPath === "/user/login") {
+//         return next();
+//     }
 
-    if (requestPath === "/vehicle/vehicles") {
-        return next();
-    }
+//     if (requestPath === "/vehicle/vehicles") {
+//         return next();
+//     }
 
-    const authoHeader = req.headrers['authorization'];
-    const token = authoHeader && authoHeader.slipt('')[1];
-    if (token == null) {
-        console.log("run")
-        if (!req.isAuthenticated) {
-            return res.redirect("/")
-        }
-    }
+//     const authoHeader = req.headrers['authorization'];
+//     const token = authoHeader && authoHeader.slipt('')[1];
+//     if (token == null) {
+//         console.log("run")
+//         if (!req.isAuthenticated) {
+//             return res.redirect("/")
+//         }
+//     }
 
-    jwt.verify(token, process.env.JWT_SE, (err, user) => {
-        if (err) {
-            return res.sendStatus(403);
-        }
+//     jwt.verify(token, process.env.JWT_SE, (err, user) => {
+//         if (err) {
+//             return res.sendStatus(403);
+//         }
 
-        req.user = user;
-        next();
+//         req.user = user;
+//         next();
 
-    })
+//     })
 
 
-}
-
+// }
 
 const requestRouter = require("./routes/Requests.js");
 const userRouter = require("./routes/Users.js");
