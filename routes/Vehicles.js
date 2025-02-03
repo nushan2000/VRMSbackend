@@ -3,10 +3,13 @@ const express=require('express');
 const bodyParser = require('body-parser');
 
 const Vehicle = require("../model/Vehicle");
-const {vehicleCollection}=require('../config')
 
-const app =express()
-const path=require('path')  
+
+
+
+
+
+const app =express() 
 
 app.use(bodyParser.json({ limit: '1000mb' })); // Adjust the limit based on your needs
 app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' })); // Adjust the limit based on your needs
@@ -38,20 +41,6 @@ router.route("/addVehicle").post(async(req,res)=>{
         driverEmail,
         vehicleName
       })
-
-        // await vehicleCollection.doc(vehicleNo).set({
-        //   vehicleNo,
-        //   vehicleType,
-        //   sheatCapacity,         
-        //   driverName,       
-        //   driverEmail,
-        //   vehicleName,
-        //   status:"yes",
-        // availability: 'yes',
-        // avilableSheat: sheatCapacity, 
-        // vehicleImg,
-        // }); 
-
        
     }catch(error){
       console.error(error.message)
