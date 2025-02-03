@@ -203,16 +203,18 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
   const requestId = req.params.id;
   const requestData = req.body;
 
+  
+
   try {
     console.log(`Updating request with ID: ${requestId}`);
 
     // Validate passengers array
-    if (
-      !Array.isArray(requestData.passengers) ||
-      requestData.passengers.length === 0
-    ) {
-      throw new Error("Passengers data is missing or invalid");
-    }
+    // if (
+    //   !Array.isArray(requestData.passengers) ||
+    //   requestData.passengers.length === 0
+    // ) {
+    //   throw new Error("Passengers data is missing or invalid");
+    // }
 
     // Find and update the request in MongoDB
     const existingRequest = await Request.findByIdAndUpdate(
@@ -220,6 +222,8 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
       requestData,
       { new: true }
     );
+
+    
 
     if (!existingRequest) {
       console.log(`Request with ID ${requestId} not found`);
@@ -229,10 +233,8 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
     console.log(`Request with ID ${requestId} updated successfully`);
 
     // Send FCM notification if approveDeenAr is being updated to true
-
-    const vehicle = await Vehicle.findOne({
-      _id: existingRequest.vehicle,
-    });
+    console.log('data',existingRequest.vehicle)
+    const vehicle = await Vehicle.findById(existingRequest.vehicle).lean();
 
     if (!vehicle) {
       console.log(`Vehicle not found for request ID ${requestId}`);
@@ -243,23 +245,22 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
 
 
     if(requestData.approveDeenAr){
-        const emailDetails = requestApprovedEmail(requestData.destination, requestData.date)
+        const emailDetails = requestApprovedEmail(existingRequest.destination, existingRequest.date)
         const { subject, html } = emailDetails;
-        const request = await Request.findOne({_id: requestId}).populate({path: "applier", select: "email"}).lean()
-        const emailResult = await emailService.sendEmail(
-            request.applier.email,
-            subject,
-            html
-         );
-         if (!emailResult.success) {
-            return {
-               success: false,
-               message: emailResult.message,
-               data: null,
-            };
-         }
+        // const emailResult = await emailService.sendEmail(
+        //     existingRequest.applier,
+        //     subject,
+        //     html
+        //  );
+        //  if (!emailResult.success) {
+        //     return {
+        //        success: false,
+        //        message: emailResult.message,
+        //        data: null,
+        //     };
+        //  }
 
-         const notificationSended = await sendNotification(request.vehicle);
+         const notificationSended = await sendNotification(existingRequest.vehicle,existingRequest.date,existingRequest.startTime, existingRequest.comeBack, existingRequest.destination);
          console.log(notificationSended);
 
     }
@@ -365,7 +366,7 @@ router.put('/status/update/:id', auth, async(req, res) => {
 })
 
 
-const sendNotification = async (vehicleId) => {
+const sendNotification = async (vehicleId, date, startTime, comeBack,destination) => {
 
     if (mongoose.Types.ObjectId.isValid(vehicleId)) {
         const objectId = new mongoose.Types.ObjectId(vehicleId);
@@ -374,9 +375,13 @@ const sendNotification = async (vehicleId) => {
         console.log("Invalid vehicleId");
     }
 
-    const driverDriverDetails = await Driver.findOne({vehicleId:objectId});
-    const title = 'vidusha';
-    const body = 'run';
+    const driverDriverDetails = await Driver.findOne({vehicleId}).lean();
+    const title = 'Faculty of Engineering Uor';
+    const body =  `🚗 Your trip details:
+    📅 Date: ${date}
+    ⏰ Start Time: ${startTime}
+    🔄 Come Back: ${comeBack}
+    📍 Destination: ${destination}`;
 
     
 
@@ -402,9 +407,9 @@ const sendNotification = async (vehicleId) => {
   
     try {
       await admin.messaging().send(message);
-      res.status(200).json({ success: true, message: 'Notification sent' });
+      return { success: true, message: 'Notification sent' };
     } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+      return { success: false, error: error.message };
     }
   };
 
