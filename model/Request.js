@@ -1,5 +1,6 @@
 //reqest form
 const mongoose = require('mongoose');
+const { Types } = require('mongoose/lib/schema');
 
 const Schema = mongoose.Schema;
 
@@ -11,14 +12,10 @@ const passengerSchema = new mongoose.Schema({
   });
 
 const requestSchema= new Schema({
-    
-
     date : {
-        type:String,
+        type: String,
         require:true
-
     },
-
     startTime :{
         type: String,
         require:true
@@ -30,38 +27,30 @@ const requestSchema= new Schema({
     reason:{
         type: String,
         require : true
-
     },
     section:{
         type: String,
         require : true
-
     },
     vehicle:{
         type: String,
         require : true
-
     },
     depatureLocation:{
         type: String,
         require : true
-
     },
     destination:{
         type: String,
         require : true
-
     },
     comeBack:{
         type: Boolean,
         require : true
-
-    
     },
     distance:{
         type: Number,
         require : true
-
     },
     approveHead:{
         type: Boolean,
@@ -70,33 +59,19 @@ const requestSchema= new Schema({
     approveDeenAr:{
         type: Boolean,
         default: false
-
     },
     driverStatus:{
         type: String,
         default: "notStart"
-
-        
     },
-   
     applier :{
-        type: String,
+        type: String, 
         require:true
     },applyDate :{
         type: Date,
-        require:true
+        default: Date.now()
     },
     passengers: [passengerSchema]
-
-
 })
-
-
-
-
-
   const Request = mongoose.model('Request', requestSchema);
-
   module.exports = Request;
-
-

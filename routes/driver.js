@@ -4,15 +4,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require("../middleware/auth");
 
+const Driver = require("../model/Driver");
 const User = require("../model/User");
 const UserSession  = require("../model/userSession");
-
-
+const Vehicle  = require("../model/Vehicle");
 
 // user signup 
-
-
-router.post('/signup',async(req,res)=>{
+router.post('/add',auth, async(req,res)=>{
     try{
         const fristName = req.body.fristName;
         const lastName = req.body.lastName;
@@ -21,16 +19,19 @@ router.post('/signup',async(req,res)=>{
         const designation  = req.body.designation ;//drop down
         const password = req.body.password; 
         const repassword = req.body.repassword;
-        const telNo = req.body.telNo;   
-            
-        
+        const telNo = req.body.telNo;
+        const vehicleId = req.body.vehicleId;  
         const existingUser = await User.findOne({ email });
         if (existingUser) {
           return res.status(400).json({ message: 'User already exists' });
         }
+        const existingDriver = await Driver.findOne({ email });
+        if (existingDriver) {
+          return res.status(400).json({ message: 'Driver already exists' });
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
     
-        const newUser = new User({
+        const newUser = new Driver({
           fristName,
           lastName,
           department,
@@ -39,20 +40,35 @@ router.post('/signup',async(req,res)=>{
           password: hashedPassword,
           repassword,
           telNo,
+          vehicleId,
         });
         
-        await newUser.save();
+        const savedUser = await newUser.save();
+
+        //update vehicle prifile
+        if(vehicleId){
+            const updatedVehicle = await Vehicle.findOneAndUpdate(
+                {
+                    _id: vehicleId,
+                },
+                {
+                    driverId: savedUser._id
+                }
+            ) 
+
+            if(!updatedVehicle){
+                return res.status(200).json({ message: 'Update vehicle profile failed' });
+            }
+        }
     
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: 'Driver registered successfully' });
     }catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Internal server error' });
       }
-
-
-
-
-
 })
+
+
 // User login
 router.route("/login").post((req,res)=>{
     const email = req.body.email; 
@@ -65,7 +81,7 @@ router.route("/login").post((req,res)=>{
         });
     }else {
         //checking exist user
-        const user=User.findOne({email}).then((user)=>{
+        const user= Driver.findOne({email}).lean().then((user)=>{
             if(user){
                 //user exist
                 const hashedPassword = user.password;
@@ -92,6 +108,12 @@ router.route("/login").post((req,res)=>{
                           fristName:user.fristName,
                           lastName:user.lastName,
                           designation:user.designation,
+                          propilePic: user.userImg,
+                          vehicleNo: user.vehicleId?.vehicleNo,
+                          vehicleImg: user.vehicleId?.vehicleImg,
+                          vehicleStatus: user.vehicleId?.status,
+                          availability: user.vehicleId?.availability,
+                          sheatCapacity: user.vehicleId?.sheatCapacity,
                           token,
                         });
                         
@@ -125,15 +147,9 @@ router.route("/login").post((req,res)=>{
   })
 
 // all user data read
-router.get('/users', auth, async (req, res) => {
-  const {designation} = req.query; 
+router.get('/all', auth, async (req, res) => {
     try {
-      let users
-      if (designation){
-        users = await User.find({designation}).lean();
-      } else {
-        users = await User.find().lean();
-      }
+      const users = await Driver.find().lean();
       const formatedUsers =  users.map((user) => {
         const {password, ...rest } = user
         return {
@@ -148,13 +164,13 @@ router.get('/users', auth, async (req, res) => {
   });
 
   // delete user using id
-  router.delete('/usersdelete/:id', auth, async (req, res) => {
+  router.delete('/delete/:id', auth, async (req, res) => {
     try {
       const userId = req.params.id;
       if(!userId){
         return res.status(200).json({ message: 'User id is required' });
       }
-      const user = await User.findByIdAndDelete(userId);
+      const user = await Driver.findByIdAndDelete(userId);
   
       if (!user) {
         return res.status(404).json({ message: 'user not found' });
@@ -173,7 +189,7 @@ router.get('/users', auth, async (req, res) => {
     const updateduser = req.body;
   
     try {
-      const user = await User.findByIdAndUpdate(userId, updateduser, { new: true });
+      const user = await Driver.findByIdAndUpdate(userId, updateduser, { new: true });
   
       if (!user) {
         return res.status(404).json({ message: 'user not found' });
@@ -186,18 +202,34 @@ router.get('/users', auth, async (req, res) => {
     }
   });
 
-  router.get('/drivers', auth, async (req, res) => {
-      try {
-        const user = await User.findOne({
-          _id: req.query.userId,
-          designation: "driver"
-        }).select('-_id -password').lean();
-        res.json(user);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+  // driver auth
+  router.get('/auth', auth, async (req, res) => {
+    const userId = req.user.userId;
+    try {
+      const user= await Driver.findOne({_id: userId}).populate({path: "vehicleId", select: "vehicleNo vehicleImg status availability sheatCapacity"}).lean();
+  
+      if (!user) {
+        return res.status(404).json({ message: 'user not found' });
       }
-    });
+        return res.json({
+          _id:user._id,
+          email:user.email,
+          fristName:user.fristName,
+          lastName:user.lastName,
+          designation:user.designation,
+          propilePic: user.userImg,
+          vehicleId: user.vehicleId?._id,
+          vehicleNo: user.vehicleId?.vehicleNo,
+          vehicleImg: user.vehicleId?.vehicleImg,
+          vehicleStatus: user.vehicleId?.status,
+          availability: user.vehicleId?.availability,
+          sheatCapacity: user.vehicleId?.sheatCapacity,
+        });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
 //all functions are working
 
 module.exports=router;

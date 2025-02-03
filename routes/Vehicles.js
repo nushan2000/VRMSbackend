@@ -12,11 +12,6 @@ app.use(bodyParser.json({ limit: '1000mb' })); // Adjust the limit based on your
 app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' })); // Adjust the limit based on your needs
 
 //add vehicle
-
-
-
-
-
 router.route("/addVehicle").post(async(req,res)=>{
     let vehicleNo=req.body.vehicleNo;
     let vehicleType=req.body.vehicleType;
@@ -44,18 +39,18 @@ router.route("/addVehicle").post(async(req,res)=>{
         vehicleName
       })
 
-        await vehicleCollection.doc(vehicleNo).set({
-          vehicleNo,
-          vehicleType,
-          sheatCapacity,         
-          driverName,       
-          driverEmail,
-          vehicleName,
-          status:"yes",
-        availability: 'yes',
-        avilableSheat: sheatCapacity, 
-        vehicleImg,
-        }); 
+        // await vehicleCollection.doc(vehicleNo).set({
+        //   vehicleNo,
+        //   vehicleType,
+        //   sheatCapacity,         
+        //   driverName,       
+        //   driverEmail,
+        //   vehicleName,
+        //   status:"yes",
+        // availability: 'yes',
+        // avilableSheat: sheatCapacity, 
+        // vehicleImg,
+        // }); 
 
        
     }catch(error){
@@ -99,6 +94,8 @@ router.get('/vehicles', async (req, res) => {
     }
   });
 
+
+  
   //delete vehicle by id
   router.delete('/vehiclesdelete/:id', async (req, res) => {
     try {
@@ -125,6 +122,7 @@ router.get('/vehicles', async (req, res) => {
     try {
       console.log("Updated vehicle data received:", updatedVehicle); // Debug: log the updated vehicle data received
   
+      
       // Use $set to ensure the statusList field is correctly updated
       const vehicle = await Vehicle.findByIdAndUpdate(
         vehicleId,

@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const CostDetails = require("../model/CostCalculation");
+const auth = require("../middleware/auth");
 
 
-router.get('/vehicle-cost/calculation', async (req, res) => {
+
+router.get('/vehicle-cost/calculation', auth, async (req, res) => {
   try {
       const model = 'camry';
       const vehicleResponse = await fetch(`https://api.api-ninjas.com/v1/cars?model=${model}`, {
@@ -62,7 +64,7 @@ router.get('/', async (req, res) => {
 });
 
 // Route to get a specific cost detail by vehicle number
-router.get('/:vehicleNo', async (req, res) => {
+router.get('/:vehicleNo', auth, async (req, res) => {
   try {
     const costDetail = await CostDetails.findOne({ vehicleNo: req.params.vehicleNo });
     if (costDetail) {
@@ -76,7 +78,7 @@ router.get('/:vehicleNo', async (req, res) => {
 });
 
 // Route to create a new cost detail
-router.post('/add', async (req, res) => {
+router.post('/add', auth,  async (req, res) => {
   const costDetail = new CostDetails(req.body);
   try {
     const newCostDetail = await costDetail.save();
@@ -87,7 +89,7 @@ router.post('/add', async (req, res) => {
 });
 
 // Route to update a cost detail
-router.put('/updatecost/:id', async (req, res) => {
+router.put('/updatecost/:id', auth, async (req, res) => {
   const vehicleId = req.params.id;
     const updatedcost = req.body;
   try {
@@ -104,7 +106,7 @@ router.put('/updatecost/:id', async (req, res) => {
 });
 
 // Route to delete a cost detail
-router.delete('/costdelete/:id', async (req, res) => {
+router.delete('/costdelete/:id', auth, async (req, res) => {
   try {
     const vehicleId = req.params.id;
     const costDetail = await CostDetails.findOneAndDelete(vehicleId);

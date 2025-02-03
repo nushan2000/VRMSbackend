@@ -3,10 +3,11 @@ const express=require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
+const auth = require("../middleware/auth");
 
 const FeedBack = require("../model/Feedback");
 
-router.post('/feedback-submit',async(req,res) => {
+router.post('/feedback-submit',auth, async(req,res) => {
     try{
         const vehicleNo = req.body.vehicleNo
         const punctuality = req.body.punctuality;
@@ -16,7 +17,6 @@ router.post('/feedback-submit',async(req,res) => {
         const overallSatisfaction = req.body.overallSatisfaction;
         const otherFeedback = req.body.otherFeedback;
         const SuggestionsForImprovement = req.body.SuggestionsForImprovement;
-     
         const newFeedback =new FeedBack ({
             vehicleNo,
             punctuality,
@@ -27,31 +27,26 @@ router.post('/feedback-submit',async(req,res) => {
             otherFeedback,
             SuggestionsForImprovement
         })
-        
-
         await newFeedback.save();
-
         res.status(201).json({message: 'Feedback submited'})
-
     } catch (error){
         res.status(500).json({message : 'Internal server error'});
     }
 })
 
-
-
 router.get('/feedbacks', async (req,res) => {
     try{
         const feedbacks = await FeedBack.find();
         res.json(feedbacks);
-
     } catch (error) {
+        
         console.error(error);
         res.status(500).json({message : 'Internal server error'})
     }
 })
+
 //genarate qr
-router.get('/generate-qr', async (req, res) => {
+router.get('/generate-qr', auth, async (req, res) => {
     try {
         const vehicleNumber = req.params.vehicleNumber;
         const qrData = `http://localhost:3001/user/feedback?vehicle=${vehicleNumber}`;

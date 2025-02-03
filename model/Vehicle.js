@@ -15,9 +15,7 @@ const vehicleSchema= new Schema({
     vehicleNo : {
         type:String,
         require:true
-
     },
-
     vehicleType :{
         type: String,
         require:true
@@ -31,42 +29,28 @@ const vehicleSchema= new Schema({
         default: function () {
             return this.sheatCapacity; // Set default value to sheatCapacity
         }
-
-    },
-    driverName:{
-        type: String,
-        require:true,
     },
     vehicleImg:{
-
         type:String,
-        
     },
     status:{
-
         type:String,
         default: "yes",
-        
     },
-
-
     availability:{
-
-        
         type:String,
         default: "yes",
-        
-    },
-    driverEmail:{
-        type:String,
-        require:true,
     },
     vehicleName:{
         type:String,
         required:true,
     },
     vehiStatus: [statusDateSchema],
-    statusList: [StatusSchema]
+    statusList: [StatusSchema],
+    driverId: {
+        type: Schema.Types.ObjectId,
+        ref: "Driver"
+    }
 
 })
 

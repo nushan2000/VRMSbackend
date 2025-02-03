@@ -2,6 +2,7 @@
 const express = require('express');
 const Request = require('../model/Request.js');
 const Vehicle = require('../model/Vehicle.js');
+const auth = require("../middleware/auth");
 
 // Create an Express router
 const router = express.Router();
