@@ -237,29 +237,7 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
 
     console.log(`Sending notification to driver (${vehicle.driverName})`);
 
-    // const message = {
-    //   data: {
-    //     title: "New Reservation",
-    //     body: "A new reservation has been added.",
-    //     // You can add more custom data to be sent with the notification
-    //   },
-    //   topic: "drivers", // The topic to which drivers are subscribed
-    // };
 
-    // const response = await admin.messaging().send(message);
-
-    // // Handle response if needed
-    // console.log("FCM notification sent:", response);
-
-    // console.log(`Notification sent to driver (${vehicle.driverName})`);
-
-    // // Update Firestore (if needed)
-    // const requestDocRef = requestCollection.doc(requestId);
-    // await requestDocRef.set(requestData, { merge: true });
-
-    // console.log(`Request data updated in Firestore for ID ${requestId}`);
-
-    //send email to applier
     if(requestData.approveDeenAr){
         const emailDetails = requestApprovedEmail(requestData.destination, requestData.date)
         const { subject, html } = emailDetails;
@@ -276,6 +254,9 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
                data: null,
             };
          }
+
+         const notificationSended = await sendNotification(request.vehicle);
+         console.log(notificationSended);
 
     }
 
@@ -380,19 +361,28 @@ router.put('/status/update/:id', auth, async(req, res) => {
 })
 
 
-router.post('/send-notification', async (req, res) => {
-    const driverId = '6788c5a5445816c347bbf2a1';
-    const { title, body } = req.body;
+const sendNotification = async (vehicleId) => {
 
-    const driver = await Driver.findById(driverId);
+    if (mongoose.Types.ObjectId.isValid(vehicleId)) {
+        const objectId = new mongoose.Types.ObjectId(vehicleId);
+        console.log(objectId); 
+    } else {
+        console.log("Invalid vehicleId");
+    }
 
-    if(!driver){
+    const driverDriverDetails = await Driver.findOne({vehicleId:objectId});
+    const title = 'vidusha';
+    const body = 'run';
+
+    
+
+    if(!driverDriverDetails){
         return res.status(400).json({ error: 'Device not found' });
     }
   
 
 
-    const driverToken = driver.mobileAppId;
+    const driverToken = driverDriverDetails.mobileAppId;
     console.log(driverToken)
     if (!driverToken) {
         return res.status(400).json({ error: 'Device token is required' });
@@ -412,7 +402,7 @@ router.post('/send-notification', async (req, res) => {
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
-  });
+  };
 
 
 module.exports = router;
