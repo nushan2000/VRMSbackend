@@ -7,9 +7,38 @@ const auth = require("../middleware/auth");
 const { requestApprovedEmail } = require('../utills/emailTemplate');
 const EmailService = require("../Services/email-service");
 const mongoose = require('mongoose');
-
+const nodemailer = require("nodemailer");
 const emailService = new EmailService();
 // Add a new request
+
+
+const transporter = nodemailer.createTransport({
+    service: "gmail", // Use your email provider (e.g., Gmail, Outlook, SMTP)
+    auth: {
+      user: "efacwebapp@gmail.com", // Change this to your email
+      pass: "kbjj xssh koxq uhyy", // Use an app password (for security)
+    },
+  });
+  
+  // Function to send email
+  const sendEmail = (to, subject, message) => {
+    const mailOptions = {
+      from: "efacwebapp@gmail.com",
+      to,
+      subject,
+      text: message,
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+  };
+
+
 router.post("/addrequest", auth, async (req, res) => {
     try {
         const {
@@ -57,7 +86,11 @@ router.post("/addrequest", auth, async (req, res) => {
 
         // Save the request to MongoDB
         const savedRequest = await newRequest.save();
-
+        sendEmail(
+            req.body.applier,
+            "Request Submitted",
+            `Your request has been submitted successfully!`
+          );
         // Use the MongoDB ID as the Firestore document ID
         // const firestoreDocId = savedRequest._id.toString();
         // const firestoreDocRef = requestCollection.doc(firestoreDocId);
@@ -243,6 +276,14 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
 
 
     if(requestData.approveDeenAr){
+
+        sendEmail(
+            req.body.applier,
+            "Request Approved by Deen or Ar",
+            `Your request has been Approved!`
+          );
+
+
         const emailDetails = requestApprovedEmail(requestData.destination, requestData.date)
         const { subject, html } = emailDetails;
         const request = await Request.findOne({_id: requestId}).populate({path: "applier", select: "email"}).lean()
@@ -262,6 +303,12 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
          const notificationSended = await sendNotification(request.vehicle);
          console.log(notificationSended);
 
+    }else if(requestData.approveHead){
+        sendEmail(
+            req.body.applier,
+            "Request Approved by Head",
+            `Your request has been Approved by Head!`
+          );
     }
 
     // Respond with success message and updated request object
