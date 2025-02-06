@@ -3,12 +3,6 @@ const express=require('express');
 const bodyParser = require('body-parser');
 
 const Vehicle = require("../model/Vehicle");
-
-
-
-
-
-
 const app =express() 
 
 app.use(bodyParser.json({ limit: '1000mb' })); // Adjust the limit based on your needs
@@ -143,5 +137,20 @@ router.get('/vehicles', async (req, res) => {
       return res.status(500).json({ message: 'Server error' });
     }
   });
+
+  router.get("/viewVehicle/:id", async (req, res) => {
+    const vehicleId = req.params.id;
+
+    try {
+        const vehicle = await Vehicle.findById(vehicleId);
+        if (!vehicle) {
+            return res.status(404).json({ message: "vehicle not found" });
+        }
+        res.json(vehicle);
+    } catch (err) {
+        console.error("Error fetching vehicle: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 //all functions are working
 module.exports=router;
