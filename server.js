@@ -85,6 +85,10 @@ app.get('/', (req, res) => {
 });
 
 
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
 const requestRouter = require("./routes/Requests.js");
 const userRouter = require("./routes/Users.js");
 const vehicleRouter = require("./routes/Vehicles.js");
