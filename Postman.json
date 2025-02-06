@@ -1,0 +1,1678 @@
+{
+	"info": {
+		"_postman_id": "82ae8cef-44b7-4218-a150-70ad4ae14f92",
+		"name": "Vehicle Resevation Managemnt System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29490087"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"mhk3515@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"designation\",\r\n    \"telNo\": \"telNo\",\r\n    \"vehicleId\": \"67850b5611ae88be6ba6febf\" // if designation is driver\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/user/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"email1@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"designation\",\r\n    \"telNo\": \"telNo\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/user/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "70"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"46-Q3mWB0BSXy+ZlQ4biQvBTvJqhEw\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 12 Jan 2025 13:00:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"User registered successfully.\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Log In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = JSON.parse(responseBody);\r",
+									"const token = res.token;\r",
+									"\r",
+									"pm.environment.set(\"token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"email1@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/user/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"email1@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/user/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"user",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "354"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"162-AcNcCe45gH3zkgfhO3Owz4lI6q8\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 12 Jan 2025 15:41:26 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"6783bd0ae0758831998a6cd1\",\n    \"email\": \"email1@gmail.com\",\n    \"lastName\": \"lastName\",\n    \"designation\": \"designation\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InVuZGVmaW5lZCBsYXN0TmFtZSIsInVzZXJJZCI6IjY3ODNiZDBhZTA3NTg4MzE5OThhNmNkMSIsImVtYWlsIjoiZW1haWwxQGdtYWlsLmNvbSIsImlhdCI6MTczNjY5NjQ4Nn0.cVJ0lSkyLXtdeNA23hcWNyu4fIOy8sw2ZMeVjLLKv0I\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/user/users?designation=driver",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"users"
+							],
+							"query": [
+								{
+									"key": "designation",
+									"value": "driver",
+									"description": "send designation if want to filter users by designation"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/user/users",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"user",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "547"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"223-TqSplz6rwvIEhkbn3vzrX1Xk+lI\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 12 Jan 2025 15:45:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"_id\": \"6783b50e77dcca69cd94596b\",\n        \"firstName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email\",\n        \"department\": \"department\",\n        \"designation\": \"designation\",\n        \"telNo\": \"telNo\",\n        \"__v\": 0\n    },\n    {\n        \"_id\": \"6783bce825cbce828beda2e8\",\n        \"firstName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email@gmail.com\",\n        \"department\": \"department\",\n        \"designation\": \"designation\",\n        \"telNo\": \"telNo\",\n        \"__v\": 0\n    },\n    {\n        \"_id\": \"6783bd0ae0758831998a6cd1\",\n        \"firstName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email1@gmail.com\",\n        \"department\": \"department\",\n        \"designation\": \"designation\",\n        \"telNo\": \"telNo\",\n        \"__v\": 0\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/user/usersdelete/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"usersdelete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6783b50e77dcca69cd94596b"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/user/usersdelete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"user",
+										"usersdelete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "6783b50e77dcca69cd94596b"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "39"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"27-uqa3nGCt3cW1jftCW3HhGBY+m3U\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 12 Jan 2025 15:51:23 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"user deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Driver By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/user/drivers?userId=678537f4e2cd83cb1547bb72",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"drivers"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "678537f4e2cd83cb1547bb72"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/user/drivers?userId=678537f4e2cd83cb1547bb72",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"drivers"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "678537f4e2cd83cb1547bb72"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "155"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"9b-61mlPxe7ec18oJIAUzYp4BqgYqo\""
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 13 Jan 2025 16:19:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"lastName\": \"lastName\",\n    \"email\": \"malshan1104@gmail.com\",\n    \"department\": \"department\",\n    \"repassword\": \"Password123\",\n    \"designation\": \"driver\",\n    \"telNo\": \"telNo\",\n    \"__v\": 0\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Request",
+			"item": [
+				{
+					"name": "Add New Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2025-01-13\",\r\n    \"startTime\": \"Password123\",\r\n    \"endTime\": \"Password123\",\r\n    \"reason\": \"Password123\",\r\n    \"vehicle\": \"67850b5611ae88be6ba6febf\",\r\n    \"section\": \"Password123\",\r\n    \"departureLocation\": \"Password123\",\r\n    \"destination\": \"Password123\",\r\n    \"comeBack\": \"Password123\",\r\n    \"distance\": \"Password123\",\r\n    \"passengers\": [\r\n        {\r\n            \"name\": \"Password123\",\r\n            \"position\": \"Password123\",\r\n            \"pickup\": \"Password123\",\r\n            \"drop\": \"Password123\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/request/addrequest",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"addrequest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Request",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2025-01-13\",\r\n    \"startTime\": \"Password123\",\r\n    \"endTime\": \"Password123\",\r\n    \"reason\": \"Password123\",\r\n    \"vehicle\": \"67850b5611ae88be6ba6febf\",\r\n    \"section\": \"Password123\",\r\n    \"departureLocation\": \"Password123\",\r\n    \"destination\": \"Password123\",\r\n    \"comeBack\": false,\r\n    \"distance\": 50,\r\n    \"passengers\": [\r\n        {\r\n            \"name\": \"Password123\",\r\n            \"position\": \"Password123\",\r\n            \"pickup\": \"Password123\",\r\n            \"drop\": \"Password123\"\r\n        }\r\n    ],\r\n    \"approveHead\": true,\r\n    \"approveDeenAr\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/request/updateRequest1/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"updateRequest1",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "67850e83ce07bd8414cda508"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get passengers to download",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/request/getPassengers?requestId=67850e83ce07bd8414cda508",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"getPassengers"
+							],
+							"query": [
+								{
+									"key": "requestId",
+									"value": "67850e83ce07bd8414cda508"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/request/getPassengers?requestId=67850e83ce07bd8414cda508",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"request",
+										"getPassengers"
+									],
+									"query": [
+										{
+											"key": "requestId",
+											"value": "67850e83ce07bd8414cda508"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "126"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"7e-+apMmL7Et2JpLzEm8Ht1bJ5XmUU\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Jan 2025 03:33:08 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"Password123\",\n        \"position\": \"Password123\",\n        \"pickup\": \"Password123\",\n        \"drop\": \"Password123\",\n        \"_id\": \"6785121be67de4d43da3ae0a\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all requests",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get request Mobile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/request/requests-mobile?vehicleId=67850b5611ae88be6ba6febf&driverStatus=notStart",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"requests-mobile"
+							],
+							"query": [
+								{
+									"key": "vehicleId",
+									"value": "67850b5611ae88be6ba6febf"
+								},
+								{
+									"key": "driverStatus",
+									"value": "notStart",
+									"description": "notStart -> request    onGoing-> ongoing request  "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/request/requests-mobile?vehicleId=67850b5611ae88be6ba6febf&driverStatus=notStart",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"request",
+										"requests-mobile"
+									],
+									"query": [
+										{
+											"key": "vehicleId",
+											"value": "67850b5611ae88be6ba6febf"
+										},
+										{
+											"key": "driverStatus",
+											"value": "notStart",
+											"description": "notStart -> request  "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "332"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"14c-ClkOXNqNcCmQdNh4OdxiocJuobw\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Jan 2025 06:53:18 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"requests\": [\n        {\n            \"requestId\": \"67850e83ce07bd8414cda508\",\n            \"date\": \"2025-01-13T00:00:00.000Z\",\n            \"startTime\": \"Password123\",\n            \"passengerCount\": 1,\n            \"to\": \"Password123\",\n            \"status\": \"notStart\"\n        },\n        {\n            \"requestId\": \"6785100b4904d485a7db3083\",\n            \"date\": \"2025-01-13T00:00:00.000Z\",\n            \"startTime\": \"Password123\",\n            \"passengerCount\": 1,\n            \"to\": \"Password123\",\n            \"status\": \"notStart\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Request DriverStatus",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"requestId\": \"67850e83ce07bd8414cda508\",\r\n    \"driverStatus\": \"onGoing\"  //notStart  onGoing  completed \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/request/update-request-driver-status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"request",
+								"update-request-driver-status"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"requestId\": \"67850e83ce07bd8414cda508\",\r\n    \"driverStatus\": \"onGoing\"  //notStart  onGoing  completed \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/request/update-request-driver-status",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"request",
+										"update-request-driver-status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "583"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"247-8amsxx1f8bF6q5WcRObsExQvF6g\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Jan 2025 19:17:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"ok\",\n    \"updatedRequest\": {\n        \"_id\": \"67850e83ce07bd8414cda508\",\n        \"date\": \"2025-01-13T00:00:00.000Z\",\n        \"startTime\": \"Password123\",\n        \"endTime\": \"Password123\",\n        \"reason\": \"Password123\",\n        \"section\": \"Password123\",\n        \"vehicle\": \"67850b5611ae88be6ba6febf\",\n        \"destination\": \"Password123\",\n        \"comeBack\": false,\n        \"distance\": 50,\n        \"approveHead\": true,\n        \"approveDeenAr\": true,\n        \"driverStatus\": \"onGoing\",\n        \"applier\": \"6785074311ae88be6ba6feb8\",\n        \"applyDate\": \"2025-01-13T12:58:12.767Z\",\n        \"passengers\": [\n            {\n                \"name\": \"Password123\",\n                \"position\": \"Password123\",\n                \"pickup\": \"Password123\",\n                \"drop\": \"Password123\",\n                \"_id\": \"6785121be67de4d43da3ae0a\"\n            }\n        ],\n        \"__v\": 0\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Vehicle",
+			"item": [
+				{
+					"name": "Add Vehicle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vehicleNo\": \"BIV-3858\",\r\n    \"vehicleType\": \"Bike\",\r\n    \"sheatCapacity\": \"2\",\r\n    \"avilableSheat\": \"2\",\r\n    \"vehicleName\": \"Bike\",\r\n    \"vehicleImg\": \"email@email.com\",\r\n    \"driverId\": \"67850b5611ae88be6ba6febf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vehicle/addVehicle",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vehicle",
+								"addVehicle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Vehicles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/vehicle/vehicles",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vehicle",
+								"vehicles"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/vehicle/vehicles",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"vehicle",
+										"vehicles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "899"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"383-zGWvjstSlRytWnqsb0q4hE2PKT0\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:20:38 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"_id\": \"67850b5611ae88be6ba6febf\",\n        \"vehicleNo\": \"BIV-3858\",\n        \"vehicleType\": \"Bike\",\n        \"sheatCapacity\": 2,\n        \"avilableSheat\": 2,\n        \"driverName\": \"Hasana\",\n        \"status\": \"yes\",\n        \"availability\": \"yes\",\n        \"driverEmail\": \"email@email.com\",\n        \"vehicleName\": \"Bike\",\n        \"vehiStatus\": [],\n        \"statusList\": [],\n        \"__v\": 0,\n        \"driverId\": \"6786617556689c1535fcee59\",\n        \"vehicleImg\": \"email@email.com\"\n    },\n    {\n        \"_id\": \"67850bcdb9b19dd9ac40d921\",\n        \"vehicleNo\": \"BIV-3858\",\n        \"vehicleType\": \"Bike\",\n        \"sheatCapacity\": 2,\n        \"avilableSheat\": 2,\n        \"driverName\": \"Hasana\",\n        \"status\": \"yes\",\n        \"availability\": \"yes\",\n        \"driverEmail\": \"email@email.com\",\n        \"vehicleName\": \"Bike\",\n        \"vehiStatus\": [],\n        \"statusList\": [],\n        \"__v\": 0\n    },\n    {\n        \"_id\": \"67850c8f30164d929f6766c3\",\n        \"vehicleNo\": \"BIV-3858\",\n        \"vehicleType\": \"Bike\",\n        \"sheatCapacity\": 2,\n        \"avilableSheat\": 2,\n        \"driverName\": \"Hasana\",\n        \"vehicleImg\": \"email@email.com\",\n        \"status\": \"yes\",\n        \"availability\": \"yes\",\n        \"driverEmail\": \"email@email.com\",\n        \"vehicleName\": \"Bike\",\n        \"vehiStatus\": [],\n        \"statusList\": [],\n        \"__v\": 0\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Update Vehicle",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"vehicleNo\": \"BIV-3858\",\r\n    \"vehicleType\": \"Bike\",\r\n    \"sheatCapacity\": \"2\",\r\n    \"avilableSheat\": \"2\",\r\n    \"vehicleName\": \"Bike\",\r\n    \"vehicleImg\": \"email@email.com\",\r\n    \"driverId\": \"6786617556689c1535fcee59\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/vehicle/updateVeh/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vehicle",
+								"updateVeh",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "67850b5611ae88be6ba6febf"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"vehicleNo\": \"BIV-3858\",\r\n    \"vehicleType\": \"Bike\",\r\n    \"sheatCapacity\": \"2\",\r\n    \"avilableSheat\": \"2\",\r\n    \"vehicleName\": \"Bike\",\r\n    \"vehicleImg\": \"email@email.com\",\r\n    \"driverId\": \"6786617556689c1535fcee59\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/vehicle/updateVeh/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"vehicle",
+										"updateVeh",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "67850b5611ae88be6ba6febf"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "387"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"183-UHOZtvB69qprAA1UqkSqxWMtjf8\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:20:19 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Vehicle updated successfully\",\n    \"vehicle\": {\n        \"_id\": \"67850b5611ae88be6ba6febf\",\n        \"vehicleNo\": \"BIV-3858\",\n        \"vehicleType\": \"Bike\",\n        \"sheatCapacity\": 2,\n        \"avilableSheat\": 2,\n        \"driverName\": \"Hasana\",\n        \"status\": \"yes\",\n        \"availability\": \"yes\",\n        \"driverEmail\": \"email@email.com\",\n        \"vehicleName\": \"Bike\",\n        \"vehiStatus\": [],\n        \"statusList\": [],\n        \"__v\": 0,\n        \"driverId\": \"6786617556689c1535fcee59\",\n        \"vehicleImg\": \"email@email.com\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Driver",
+			"item": [
+				{
+					"name": "Add Driver",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fristName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"12356@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"driver\",\r\n    \"telNo\": \"telNo\",\r\n    \"vehicleId\": \"67850b5611ae88be6ba6febf\" // if designation is driver\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/driver/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fristName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"12356@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"driver\",\r\n    \"telNo\": \"telNo\",\r\n    \"vehicleId\": \"67850b5611ae88be6ba6febf\" // if designation is driver\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/driver/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"add"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "44"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"2c-O7lz5FDs7RLWYRSRitiXuEbYwXM\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 11:58:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Driver registered successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Driver Log in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = JSON.parse(responseBody);\r",
+									"const token = res.token;\r",
+									"\r",
+									"pm.environment.set(\"token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"email2555@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/driver/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"123568@gmail.com\",\r\n    \"password\": \"Password123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/driver/login",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "434"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1b2-3oQIOj6CJ/zYDZns1nsqvyvX6T8\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:00:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"67865f678c7e87c990d704b7\",\n    \"email\": \"123568@gmail.com\",\n    \"fristName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"vehicleNo\": \"BIV-3858\",\n    \"vehicleStatus\": \"yes\",\n    \"availability\": \"yes\",\n    \"sheatCapacity\": 2,\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImZpcnN0TmFtZSBsYXN0TmFtZSIsInVzZXJJZCI6IjY3ODY1ZjY3OGM3ZTg3Yzk5MGQ3MDRiNyIsImVtYWlsIjoiMTIzNTY4QGdtYWlsLmNvbSIsImlhdCI6MTczNjg1OTY1M30.dxGy83SLOJlSY7vHeeh-xMHbCecuHeP0aTse5JLiF6o\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all drivers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/driver/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/driver/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "599"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"257-9RM2y5oxEbj4rr5sXCJJScZFbc4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:11:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"_id\": \"67865f678c7e87c990d704b7\",\n        \"fristName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"123568@gmail.com\",\n        \"repassword\": \"Password123\",\n        \"telNo\": \"telNo\",\n        \"vehicleId\": \"67850b5611ae88be6ba6febf\",\n        \"__v\": 0\n    },\n    {\n        \"_id\": \"6786617556689c1535fcee59\",\n        \"fristName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email25@gmail.com\",\n        \"repassword\": \"Password123\",\n        \"telNo\": \"telNo\",\n        \"vehicleId\": \"67850b5611ae88be6ba6febf\",\n        \"__v\": 0\n    },\n    {\n        \"_id\": \"678661f92505542f14ddaa32\",\n        \"fristName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email2555@gmail.com\",\n        \"repassword\": \"Password123\",\n        \"telNo\": \"telNo\",\n        \"vehicleId\": \"67850b5611ae88be6ba6febf\",\n        \"__v\": 0\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete Driver",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/driver/delete/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "67865f678c7e87c990d704b7"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/driver/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "67865f678c7e87c990d704b7"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "39"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"27-uqa3nGCt3cW1jftCW3HhGBY+m3U\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:13:15 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"user deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Driver",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fristName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"email2555@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"driver\",\r\n    \"telNo\": \"telNo\",\r\n    \"vehicleId\": \"67850b5611ae88be6ba6febf\" // if designation is driver\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/driver/update/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6786617556689c1535fcee59"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fristName\": \"firstName\",\r\n    \"lastName\": \"lastName\",\r\n    \"department\": \"department\",\r\n    \"email\": \"email2555@gmail.com\",\r\n    \"password\": \"Password123\",\r\n    \"repassword\": \"Password123\",\r\n    \"designation\": \"driver\",\r\n    \"telNo\": \"telNo\",\r\n    \"vehicleId\": \"67850b5611ae88be6ba6febf\" // if designation is driver\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/driver/update/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "6786617556689c1535fcee59"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "272"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"110-WelG9lbadv4Ngq7I4+r9FYV3DB4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 14 Jan 2025 13:15:52 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"user updated successfully\",\n    \"user\": {\n        \"_id\": \"6786617556689c1535fcee59\",\n        \"fristName\": \"firstName\",\n        \"lastName\": \"lastName\",\n        \"email\": \"email2555@gmail.com\",\n        \"password\": \"Password123\",\n        \"repassword\": \"Password123\",\n        \"telNo\": \"telNo\",\n        \"vehicleId\": \"67850b5611ae88be6ba6febf\",\n        \"__v\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Driver auth",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/driver/auth",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"driver",
+								"auth"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/driver/auth",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"driver",
+										"auth"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "225"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"e1-UX2dd4lzVhZJnqQGx14HxlxeWqg\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Jan 2025 07:33:45 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"678661f92505542f14ddaa32\",\n    \"email\": \"email2555@gmail.com\",\n    \"fristName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"vehicleNo\": \"BIV-3858\",\n    \"vehicleImg\": \"email@email.com\",\n    \"vehicleStatus\": \"yes\",\n    \"availability\": \"yes\",\n    \"sheatCapacity\": 2\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
