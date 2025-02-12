@@ -80,6 +80,14 @@ connection.once('open', () => {
 
 
 // }
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
 
 const requestRouter = require("./routes/Requests.js");
 const userRouter = require("./routes/Users.js");
