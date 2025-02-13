@@ -6,6 +6,7 @@ const auth = require("../middleware/auth");
 
 const User = require("../model/User");
 const UserSession  = require("../model/userSession");
+const { route } = require("./Requests");
 
 
 
@@ -199,5 +200,27 @@ router.get('/users', auth, async (req, res) => {
       }
     });
 //all functions are working
+
+router.get('/authLinks/:id', async(req, res) => {
+  try{
+    const userId = req.params.id;
+
+    console.log(userId)
+
+    const user = await User.findById(userId);
+
+    if(!user){
+      return res.status(404).json({ message: 'user not found' });
+    }
+
+    const userType = user.designation;
+
+    res.json({'code':200,'data':userType });
+
+  }catch(err){
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
 
 module.exports=router;

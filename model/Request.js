@@ -71,6 +71,15 @@ const requestSchema= new Schema({
         type: Date,
         default: Date.now()
     },
+    departmentHeadNote :{
+        type: String, 
+        
+    },
+    arDeanNote :{
+        type: String, 
+        
+    },
+   
     passengers: [passengerSchema]
 })
   const Request = mongoose.model('Request', requestSchema);
