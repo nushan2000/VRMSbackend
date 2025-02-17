@@ -179,14 +179,15 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
 router.get("/RequestVehicles/:date", async (req, res) => {
   try {
     const requestDate = req.params.date;
-    console.log("date", requestDate);
+   // console.log("date", requestDate);
     const requests = await Request.find({
       date: requestDate,
       approveDeenAr: true,
     });
-    console.log("reqes", requests);
+    //console.log("reqes", requests);
 
     const allVehicles = await Vehicle.find();
+//console.log("all",allVehicles);
 
     const groupedData = requests.reduce((acc, request) => {
       const vehicleName = request.vehicle;
@@ -204,13 +205,13 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     }, {});
 
     const groupedArray = Object.values(groupedData);
-    console.log("array group", groupedArray);
+    //console.log("array group", groupedArray);
 
     const vehicleNames = groupedArray.map((v) => v.vehicleName);
-    console.log(vehicleNames);
+    //console.log("vehicle name",vehicleNames);
 
-    const vehicles = await Vehicle.find({ vehicleName: { $in: vehicleNames } });
-    //console.log(vehicles);
+    const vehicles = await Vehicle.find({ _id: { $in: vehicleNames } });
+   // console.log("id",vehicles._id);
 
     // const finalDat = groupedArray.map(group => {
     //     const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
@@ -226,11 +227,13 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     //     };
     // });
     const finalData = allVehicles.map((vehicle) => {
+      //console.log("ingroup",vehicle);
+      
       // Find the matching grouped data for this vehicle
       const grouped = groupedArray.find(
-        (g) => g.vehicleName === vehicle.vehicleName
+        (g) => g.vehicleName === vehicle._id.toString()
       );
-      console.log("group", grouped);
+      //console.log("group", grouped);
 
       return {
         id: vehicle._id,
@@ -246,7 +249,7 @@ router.get("/RequestVehicles/:date", async (req, res) => {
 
     res.json(finalData);
   } catch (err) {
-    console.error("Error fetching requests: ", err);
+    //console.error("Error fetching requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
