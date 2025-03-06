@@ -9,7 +9,8 @@ const EmailService = require("../Services/email-service");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const User = require("../model/Driver");
-const emailService = new EmailService();
+//const emailService = new EmailService();
+//const Tellio = require('twilio');
 // Add a new request
 
 const transporter = nodemailer.createTransport({
@@ -296,6 +297,11 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
     console.log(`Sending notification to driver (${vehicle.driverName})`);
 
     if (requestData.approveDeenAr) {
+
+      const driver = await Driver.findOne({ vehicleId:existingRequest.vehicle });
+
+      
+
       sendEmail(
         req.body.applier,
         "Request Approved by Deen or Ar",
@@ -351,7 +357,18 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
+router.delete('/requests/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      const deletedRequest = await Request.findByIdAndDelete(id);
+      if (!deletedRequest) {
+          return res.status(404).json({ message: 'Request not found' });
+      }
+      res.json({ message: 'Request deleted successfully', deletedRequest });
+  } catch (error) {
+      res.status(500).json({ message: 'Error deleting request', error: error.message });
+  }
+});
 router.get("/getPassengers", auth, async (req, res) => {
   const requestId = req.query.requestId;
   try {
