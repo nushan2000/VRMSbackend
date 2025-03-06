@@ -9,7 +9,8 @@ const EmailService = require("../Services/email-service");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const User = require("../model/Driver");
-const emailService = new EmailService();
+//const emailService = new EmailService();
+//const Tellio = require('twilio');
 // Add a new request
 
 const transporter = nodemailer.createTransport({
@@ -179,14 +180,15 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
 router.get("/RequestVehicles/:date", async (req, res) => {
   try {
     const requestDate = req.params.date;
-    console.log("date", requestDate);
+   // console.log("date", requestDate);
     const requests = await Request.find({
       date: requestDate,
       approveDeenAr: true,
     });
-    console.log("reqes", requests);
+    //console.log("reqes", requests);
 
     const allVehicles = await Vehicle.find();
+//console.log("all",allVehicles);
 
     const groupedData = requests.reduce((acc, request) => {
       const vehicleName = request.vehicle;
@@ -204,13 +206,13 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     }, {});
 
     const groupedArray = Object.values(groupedData);
-    console.log("array group", groupedArray);
+    //console.log("array group", groupedArray);
 
     const vehicleNames = groupedArray.map((v) => v.vehicleName);
-    console.log(vehicleNames);
+    //console.log("vehicle name",vehicleNames);
 
-    const vehicles = await Vehicle.find({ vehicleName: { $in: vehicleNames } });
-    //console.log(vehicles);
+    const vehicles = await Vehicle.find({ _id: { $in: vehicleNames } });
+   // console.log("id",vehicles._id);
 
     // const finalDat = groupedArray.map(group => {
     //     const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
@@ -226,11 +228,13 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     //     };
     // });
     const finalData = allVehicles.map((vehicle) => {
+      //console.log("ingroup",vehicle);
+      
       // Find the matching grouped data for this vehicle
       const grouped = groupedArray.find(
-        (g) => g.vehicleName === vehicle.vehicleName
+        (g) => g.vehicleName === vehicle._id.toString()
       );
-      console.log("group", grouped);
+      //console.log("group", grouped);
 
       return {
         id: vehicle._id,
@@ -246,7 +250,7 @@ router.get("/RequestVehicles/:date", async (req, res) => {
 
     res.json(finalData);
   } catch (err) {
-    console.error("Error fetching requests: ", err);
+    //console.error("Error fetching requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -293,6 +297,11 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
     console.log(`Sending notification to driver (${vehicle.driverName})`);
 
     if (requestData.approveDeenAr) {
+
+      const driver = await Driver.findOne({ vehicleId:existingRequest.vehicle });
+
+      
+
       sendEmail(
         req.body.applier,
         "Request Approved by Deen or Ar",
@@ -348,7 +357,18 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
+router.delete('/requests/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      const deletedRequest = await Request.findByIdAndDelete(id);
+      if (!deletedRequest) {
+          return res.status(404).json({ message: 'Request not found' });
+      }
+      res.json({ message: 'Request deleted successfully', deletedRequest });
+  } catch (error) {
+      res.status(500).json({ message: 'Error deleting request', error: error.message });
+  }
+});
 router.get("/getPassengers", auth, async (req, res) => {
   const requestId = req.query.requestId;
   try {

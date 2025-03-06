@@ -24,11 +24,19 @@ router.get('/getAvailableSeats', async (req, res) => {
     
     
 
-        const selectedDate = new Date(date);
+        const { parse, format } = require('date-fns');
+
+const selectedDate = format(parse(date, 'yyyy-MM-d', new Date()), 'yyyy-MM-dd');
+console.log("Formatted Date:", selectedDate);
+
+// const finalDate = new Date(`${selectedDate}T00:00:00.000Z`);
+// console.log("Date string converted to JavaScript Date object:", finalDate);
+
+
 
         console.log("Date string converted to JavaScript Date object:", selectedDate);
 
-        const requests = await Request.find({ date: selectedDate.toISOString().split('T')[0], vehicle });
+        const requests = await Request.find({ date: selectedDate, vehicle });
 
 
         console.log("Retrieved requests for the specified date and vehicle:", requests);
@@ -43,7 +51,7 @@ router.get('/getAvailableSeats', async (req, res) => {
         });
         console.log("Total number of passengers calculated:", totalPassengers);
 
-        const vehicleInfo = await Vehicle.findOne({ vehicleName: vehicle });
+        const vehicleInfo = await Vehicle.findOne({ _id: vehicle });
 
         if (!vehicleInfo) {
             console.error("Vehicle not found.");
