@@ -60,6 +60,14 @@ const requestSchema= new Schema({
         type: Boolean,
         default: false
     },
+    approveDeen:{
+        type: Boolean,
+        default: false
+    },
+    approveChecker:{
+        type: Boolean,
+        default: false
+    },
     driverStatus:{
         type: String,
         default: "notStart"
@@ -78,6 +86,18 @@ const requestSchema= new Schema({
     arDeanNote :{
         type: String, 
         
+    },
+    deanNote :{
+        type: String, 
+        
+    },
+    checkerNote :{
+        type: String, 
+        
+    },
+    approveStatus :{
+        type: String, 
+        default: "notApprovedHead"
     },
    
     passengers: [passengerSchema]

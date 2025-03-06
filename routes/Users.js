@@ -3,13 +3,60 @@ const express=require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require("../middleware/auth");
-
+const multer = require('multer');
+const xlsx = require('xlsx');
 const User = require("../model/User");
 const UserSession  = require("../model/userSession");
 const { route } = require("./Requests");
 
 
+const storage = multer.memoryStorage(); // Keeps file in memory (no need to save to disk)
+const upload = multer({ storage });
 
+router.post('/importUsers', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0]; // Get first sheet
+        const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]); // Convert to JSON array
+
+        const users = [];
+
+        for (const row of sheetData) {
+            const existingUser = await User.findOne({ email: row.email });
+
+            if (!existingUser) {
+                const hashedPassword = await bcrypt.hash(row.password, 10);
+                
+                const user = {
+                    fristName: row.fristName,
+                    lastName: row.lastName,
+                    department: row.department,
+                    designation: row.designation,
+                    email: row.email,
+                    password: hashedPassword,
+                    repassword: row.repassword,
+                    telNo: row.telNo,
+                };
+
+                users.push(user);
+            }
+        }
+
+        if (users.length > 0) {
+            await User.insertMany(users); // Bulk insert all users at once
+        }
+
+        res.status(201).json({ message: `${users.length} users imported successfully` });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 // user signup 
 
 
