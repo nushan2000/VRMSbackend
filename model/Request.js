@@ -28,13 +28,17 @@ const requestSchema= new Schema({
         type: String,
         require : true
     },
+    reasonFunded:{
+        type: String,
+        require : true
+    },
     section:{
         type: String,
         require : true
     },
     vehicle:{
         type: String,
-        require : true
+        require : false
     },
     depatureLocation:{
         type: String,
@@ -94,11 +98,16 @@ const requestSchema= new Schema({
     checkerNote :{
         type: String, 
         
+        
     },
     approveStatus :{
         type: String, 
         default: "notApprovedHead"
     },
+    filePath:{
+        type:String,
+        default:false
+    } ,
    
     passengers: [passengerSchema]
 })
