@@ -104,6 +104,7 @@
     "socket.io": "^4.8.1",
     "statuses": "^2.0.1",
     "supports-color": "^5.5.0",
+    "systeminformation": "^5.25.11",
     "to-regex-range": "^5.0.1",
     "toidentifier": "^1.0.1",
     "touch": "^3.1.0",

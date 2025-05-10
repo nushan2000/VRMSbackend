@@ -9,6 +9,7 @@ const EmailService = require("../Services/email-service");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const User = require("../model/Driver");
+const multer = require("multer");
 //const emailService = new EmailService();
 //const Tellio = require('twilio');
 // Add a new request
@@ -39,13 +40,27 @@ const sendEmail = (to, subject, message) => {
   });
 };
 
-router.post("/addrequest", auth, async (req, res) => {
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Make sure 'uploads' folder exists
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
   try {
+    let parsedPassengers;
     const {
       date,
       startTime,
       endTime,
       reason,
+      reasonFunded,
       vehicle,
       section,
       depatureLocation,
@@ -59,9 +74,25 @@ router.post("/addrequest", auth, async (req, res) => {
       applyDate,
     } = req.body;
 
-    // Validate passengers array
-    if (!Array.isArray(passengers) || passengers.length === 0) {
-      throw new Error("Passengers data is missing or invalid");
+    // Parse passengers after receiving it as a string
+    try {
+      parsedPassengers = JSON.parse(passengers);
+    } catch (e) {
+      return res.status(400).json({ message: "Invalid passengers format" });
+    }
+
+    // Validate passengers array after parsing
+    if (!Array.isArray(parsedPassengers) || parsedPassengers.length === 0) {
+      return res.status(400).json({ message: "Passengers data is missing or invalid" });
+    }
+
+    const uploadedFile = req.file;
+
+    // Check for duplicate schedule before creating the document
+    const existingSchedule = await Request.findOne({ startTime, endTime, date });
+
+    if (existingSchedule) {
+      return res.status(400).json({ message: "Schedule already exists for this time and date!" });
     }
 
     // Create the MongoDB document
@@ -70,78 +101,60 @@ router.post("/addrequest", auth, async (req, res) => {
       startTime,
       endTime,
       reason,
+      reasonFunded,
       vehicle,
       section,
       depatureLocation,
       destination,
       comeBack,
       distance,
-      passengers,
+      passengers: parsedPassengers,
       approveHead,
       approveDeenAr,
       applier,
       applyDate,
       driverStatus: "notStart",
+      filePath: uploadedFile?.path || null
     });
 
     // Save the request to MongoDB
     const savedRequest = await newRequest.save();
+
+    // Send confirmation email to the applier
     sendEmail(
-      req.body.applier,
+      applier,
       "Request Submitted",
       `Your request has been submitted successfully!`
     );
 
-    const headUser = User.find({ designation: "head", department: section });
-    console.log("head user ", headUser);
-    const arUser = User.find({ designation: "ar"});
-    const deanUser = User.find({ designation: "dean"});
-if(headUser){
-    sendEmail(
-        headUser.email,
-        "New Request is Added",
-        `New Request is Added by ${req.body.applier}!`
-      );
-}else{
-    sendEmail(
-        arUser.email,
-        "New Request is Added",
-        `New Request is Added by ${req.body.applier}!`
-      );
+    // Fetch users asynchronously
+    const headUser = await User.findOne({ designation: "head", department: section });
+    const arUser = await User.findOne({ designation: "ar" });
+    const deanUser = await User.findOne({ designation: "dean" });
+
+    if (headUser) {
       sendEmail(
-        deanUser.email,
-        "New Request is Added",
-        `New Request is Added by ${req.body.applier}!`
+        headUser.email,
+        "New Request Added",
+        `New request has been added by ${applier}!`
       );
-}
-    
+    } else {
+      if (arUser) {
+        sendEmail(
+          arUser.email,
+          "New Request Added",
+          `New request has been added by ${applier}!`
+        );
+      }
+      if (deanUser) {
+        sendEmail(
+          deanUser.email,
+          "New Request Added",
+          `New request has been added by ${applier}!`
+        );
+      }
+    }
 
-    // Use the MongoDB ID as the Firestore document ID
-    // const firestoreDocId = savedRequest._id.toString();
-    // const firestoreDocRef = requestCollection.doc(firestoreDocId);
-
-    // Save request data to Firestore
-    // await firestoreDocRef.set({
-    //     id: firestoreDocId,
-    //     date,
-    //     startTime,
-    //     endTime,
-    //     reason,
-    //     section,
-    //     vehicle,
-    //     departureLocation,
-    //     destination,
-    //     comeBack,
-    //     distance,
-    //     passengers,
-    //     approveHead: false,
-    //     approveDeenAr: false,
-    //     applier,
-    //     applyDate,
-    //     driverStatus: "notStart"
-    // });
-
-    // Respond with success message and new request object
     res.json({ status: "ok", newRequest: savedRequest });
   } catch (err) {
     console.error("Error occurred: ", err);
@@ -149,7 +162,8 @@ if(headUser){
   }
 });
 
-// Get all requests
+
+
 router.get("/requests", async (req, res) => {
   try {
     const requests = await Request.find();

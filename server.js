@@ -6,8 +6,8 @@ const dotenv=require("dotenv");
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-admin-key.json');
 const app=express();
-
-
+const os = require("os"); 
+const si = require("systeminformation"); 
 require("dotenv").config();
 
 const http = require('http');
@@ -23,6 +23,34 @@ admin.initializeApp({
 
 
 const PORT1 = process.env.PORT || 8080;
+app.get("/api/system-info", async (req, res) => {
+  try {
+    const cpu = os.cpus()[0].model;
+    const totalRAM = os.totalmem() / (1024 * 1024 * 1024); // Convert to GB
+    const freeRAM = os.freemem() / (1024 * 1024 * 1024); // Convert to GB
+    const osType = os.type();
+    const osPlatform = os.platform();
+    const osRelease = os.release();
+    const diskInfo = await si.diskLayout();
+
+    res.json({
+      cpu,
+      totalRAM: totalRAM.toFixed(2) + " GB",
+      freeRAM: freeRAM.toFixed(2) + " GB",
+      osType,
+      osPlatform,
+      osRelease,
+      storage: diskInfo.map(disk => ({
+        device: disk.device,
+        size: (disk.size / (1024 * 1024 * 1024)).toFixed(2) + " GB",
+        type: disk.type,
+      })),
+    });
+  } catch (error) {
+    console.error("System Info Fetch Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 
