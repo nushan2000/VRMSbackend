@@ -98,7 +98,7 @@ const requestSchema= new Schema({
     checkerNote :{
         type: String, 
         
-        
+
     },
     approveStatus :{
         type: String, 
@@ -108,6 +108,12 @@ const requestSchema= new Schema({
         type:String,
         default:false
     } ,
+    startDateTime:{
+        type: String,
+    },
+    endDateTime:{
+        type: String,
+    },
    
     passengers: [passengerSchema]
 })

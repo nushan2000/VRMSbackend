@@ -8,8 +8,9 @@ const { requestApprovedEmail } = require("../utills/emailTemplate");
 const EmailService = require("../Services/email-service");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-const User = require("../model/Driver");
+
 const multer = require("multer");
+const User = require("../model/User");
 //const emailService = new EmailService();
 //const Tellio = require('twilio');
 // Add a new request
@@ -54,6 +55,8 @@ const upload = multer({ storage: storage });
 
 router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
   try {
+
+    let approveHead; //line 112//for if dean ar add a request, is should automatically be head approved
     let parsedPassengers;
     const {
       date,
@@ -66,7 +69,7 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       depatureLocation,
       destination,
       comeBack,
-      approveHead,
+      
       approveDeenAr,
       distance,
       passengers,
@@ -95,6 +98,22 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       return res.status(400).json({ message: "Schedule already exists for this time and date!" });
     }
 
+   
+    //const deanUserr = await User.findOne({ email: "dean@mme.ruh.ac.lk".trim() });
+
+   // console.log("dean",deanUserr); // Check full user object
+   // const allUsers = await User.find({});
+// console.log(allUsers);
+
+    const applyingUser = await User.findOne({email:applier});
+    console.log("email",applier);
+    console.log("desig",applyingUser);
+    
+if (applyingUser) {
+  if (applyingUser.designation === "ar") approveHead = true;
+  if (applyingUser.designation === "dean") approveHead = true;
+  if (applyingUser.designation === "head") approveHead = true;
+}
     // Create the MongoDB document
     const newRequest = new Request({
       date,
@@ -161,8 +180,6 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-
 
 router.get("/requests", async (req, res) => {
   try {

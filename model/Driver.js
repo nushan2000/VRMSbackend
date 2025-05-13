@@ -41,6 +41,6 @@ const driverSchema= new Schema({
     }
  })
 
-const User=mongoose.model("Driver",driverSchema);
+const Driver=mongoose.model("Driver",driverSchema);
 
-module.exports=User;
+module.exports=Driver;
