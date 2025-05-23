@@ -10,10 +10,23 @@ const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 
 const multer = require("multer");
+const path = require('path'); 
+const fs = require('fs');
 const User = require("../model/User");
 //const emailService = new EmailService();
 //const Tellio = require('twilio');
 // Add a new request
+
+// Setup multer (memory storage or disk storage based on your needs)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'documents'); // folder must exist or be created beforehand
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
 
 const transporter = nodemailer.createTransport({
   service: "gmail", // Use your email provider (e.g., Gmail, Outlook, SMTP)
@@ -41,17 +54,17 @@ const sendEmail = (to, subject, message) => {
   });
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Make sure 'uploads' folder exists
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/"); // Make sure 'uploads' folder exists
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+//     cb(null, uniqueSuffix + path.extname(file.originalname));
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
   try {
@@ -75,6 +88,7 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       passengers,
       applier,
       applyDate,
+      documentUrls
     } = req.body;
 
     // Parse passengers after receiving it as a string
@@ -133,7 +147,8 @@ if (applyingUser) {
       applier,
       applyDate,
       driverStatus: "notStart",
-      filePath: uploadedFile?.path || null
+      documentUrls
+      // filePath: uploadedFile?.path || null
     });
 
     // Save the request to MongoDB
@@ -540,5 +555,36 @@ const sendNotification = async (
     return { success: false, error: error.message };
   }
 };
+
+router.post("/upload-document", auth, upload.single('document'), async (req, res) => {
+  try {
+
+    const documentUrl = req.file.filename;
+    res.status(200).json({ success: true, message: 'Document uploaded successfully', data: {documentUrl} });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/get-document/:documentUrl', auth, async (req, res) => {
+  try {
+    const documentUrl = req.params.documentUrl;
+    const filePath = path.join(__dirname, '../documents', documentUrl);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Option 1: Download the file
+    res.download(filePath); // prompts download in browser
+
+    // Option 2: Just send the file for viewing (like PDF/image in browser)
+    //res.sendFile(filePath);
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

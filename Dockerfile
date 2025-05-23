@@ -20,14 +20,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Install dependencies
+RUN npm install
 
 # Copy application source code
 COPY . .
 
 # Expose the port your app uses
-EXPOSE 8081
+EXPOSE 8080
 
 # Run your application
 CMD ["node", "server.js"]
