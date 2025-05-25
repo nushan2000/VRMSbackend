@@ -46,7 +46,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Make sure 'uploads' folder exists
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
@@ -55,7 +55,6 @@ const upload = multer({ storage: storage });
 
 router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
   try {
-
     let approveHead; //line 112//for if dean ar add a request, is should automatically be head approved
     let parsedPassengers;
     const {
@@ -69,7 +68,7 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       depatureLocation,
       destination,
       comeBack,
-      
+
       approveDeenAr,
       distance,
       passengers,
@@ -86,34 +85,41 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
 
     // Validate passengers array after parsing
     if (!Array.isArray(parsedPassengers) || parsedPassengers.length === 0) {
-      return res.status(400).json({ message: "Passengers data is missing or invalid" });
+      return res
+        .status(400)
+        .json({ message: "Passengers data is missing or invalid" });
     }
 
     const uploadedFile = req.file;
 
     // Check for duplicate schedule before creating the document
-    const existingSchedule = await Request.findOne({ startTime, endTime, date });
+    const existingSchedule = await Request.findOne({
+      startTime,
+      endTime,
+      date,
+    });
 
     if (existingSchedule) {
-      return res.status(400).json({ message: "Schedule already exists for this time and date!" });
+      return res
+        .status(400)
+        .json({ message: "Schedule already exists for this time and date!" });
     }
 
-   
     //const deanUserr = await User.findOne({ email: "dean@mme.ruh.ac.lk".trim() });
 
-   // console.log("dean",deanUserr); // Check full user object
-   // const allUsers = await User.find({});
-// console.log(allUsers);
+    // console.log("dean",deanUserr); // Check full user object
+    // const allUsers = await User.find({});
+    // console.log(allUsers);
 
-    const applyingUser = await User.findOne({email:applier});
-    console.log("email",applier);
-    console.log("desig",applyingUser);
-    
-if (applyingUser) {
-  if (applyingUser.designation === "ar") approveHead = true;
-  if (applyingUser.designation === "dean") approveHead = true;
-  if (applyingUser.designation === "head") approveHead = true;
-}
+    const applyingUser = await User.findOne({ email: applier });
+    console.log("email", applier);
+    console.log("desig", applyingUser);
+
+    if (applyingUser) {
+      if (applyingUser.designation === "ar") approveHead = true;
+      if (applyingUser.designation === "dean") approveHead = true;
+      if (applyingUser.designation === "head") approveHead = true;
+    }
     // Create the MongoDB document
     const newRequest = new Request({
       date,
@@ -133,7 +139,7 @@ if (applyingUser) {
       applier,
       applyDate,
       driverStatus: "notStart",
-      filePath: uploadedFile?.path || null
+      filePath: uploadedFile?.path || null,
     });
 
     // Save the request to MongoDB
@@ -147,7 +153,10 @@ if (applyingUser) {
     );
 
     // Fetch users asynchronously
-    const headUser = await User.findOne({ designation: "head", department: section });
+    const headUser = await User.findOne({
+      designation: "head",
+      department: section,
+    });
     const arUser = await User.findOne({ designation: "ar" });
     const deanUser = await User.findOne({ designation: "dean" });
 
@@ -211,7 +220,7 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
 router.get("/RequestVehicles/:date", async (req, res) => {
   try {
     const requestDate = req.params.date;
-   // console.log("date", requestDate);
+    // console.log("date", requestDate);
     const requests = await Request.find({
       date: requestDate,
       approveDeenAr: true,
@@ -219,7 +228,7 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     //console.log("reqes", requests);
 
     const allVehicles = await Vehicle.find();
-//console.log("all",allVehicles);
+    //console.log("all",allVehicles);
 
     const groupedData = requests.reduce((acc, request) => {
       const vehicleName = request.vehicle;
@@ -243,7 +252,7 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     //console.log("vehicle name",vehicleNames);
 
     const vehicles = await Vehicle.find({ _id: { $in: vehicleNames } });
-   // console.log("id",vehicles._id);
+    // console.log("id",vehicles._id);
 
     // const finalDat = groupedArray.map(group => {
     //     const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
@@ -260,7 +269,7 @@ router.get("/RequestVehicles/:date", async (req, res) => {
     // });
     const finalData = allVehicles.map((vehicle) => {
       //console.log("ingroup",vehicle);
-      
+
       // Find the matching grouped data for this vehicle
       const grouped = groupedArray.find(
         (g) => g.vehicleName === vehicle._id.toString()
@@ -294,15 +303,6 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
   try {
     console.log(`Updating request with ID: ${requestId}`);
 
-    // Validate passengers array
-    // if (
-    //   !Array.isArray(requestData.passengers) ||
-    //   requestData.passengers.length === 0
-    // ) {
-    //   throw new Error("Passengers data is missing or invalid");
-    // }
-
-    // Find and update the request in MongoDB
     const existingRequest = await Request.findByIdAndUpdate(
       requestId,
       requestData,
@@ -316,88 +316,160 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
 
     console.log(`Request with ID ${requestId} updated successfully`);
 
-    // Send FCM notification if approveDeenAr is being updated to true
-    console.log("data", existingRequest.vehicle);
-    const vehicle = await Vehicle.findById(existingRequest.vehicle).lean();
+    if (requestData.approveStatus === "notApprovedHead") {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
+        const headUsers = await User.find({
+          designation: "head",
+          department: requestData.section,
+        });
+        const deanUsers = await User.find({ designation: "dean" });
 
-    if (!vehicle) {
-      console.log(`Vehicle not found for request ID ${requestId}`);
-      throw new Error("Vehicle not found for the reservation");
+        for (const user of headUsers) {
+          await sendEmail(
+            user.email,
+
+            `New Request is added by ${req.body.applier}!`
+          );
+        }
+
+        await sendEmail(
+          req.body.applier,
+          "Request Approved by Head",
+          "Your request has been Approved by Head!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
     }
+    if (requestData.approveStatus === "headApproved") {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
 
-    console.log(`Sending notification to driver (${vehicle.driverName})`);
+        const deanUsers = await User.find({ designation: "dean" });
 
-    if (requestData.approveDeenAr) {
+        for (const user of checkerUsers) {
+          await sendEmail(
+            user.email,
+            "New Request Approved by Head",
+            `This Request is added by ${req.body.applier}!`
+          );
+        }
 
-      const driver = await Driver.findOne({ vehicleId:existingRequest.vehicle });
-
-      
-
-      sendEmail(
-        req.body.applier,
-        "Request Approved by Deen or Ar",
-        `Your request has been Approved!`
-      );
-      
-      const emailDetails = requestApprovedEmail(
-        requestData.destination,
-        requestData.date
-      );
-      const { subject, html } = emailDetails;
-      // const emailResult = await emailService.sendEmail(
-      //     existingRequest.applier,
-      //     subject,
-      //     html
-      //  );
-      //  if (!emailResult.success) {
-      //     return {
-      //        success: false,
-      //        message: emailResult.message,
-      //        data: null,
-      //     };
-      //  }
-
-      //  const notificationSended = await sendNotification(existingRequest.vehicle,existingRequest.date,existingRequest.startTime, existingRequest.comeBack, existingRequest.destination);
-      //  console.log(notificationSended);
-    } else if (requestData.approveHead) {
-        const arUser = User.find({ designation: "ar"});
-      console.log("head user ", arUser);
-      const deanUser = User.find({ designation: "dean"});
-      console.log("head user ", deanUser);
-      sendEmail(
-        deanUser.email,
-        "New Request is Added that approved by head",
-        `This Request is Added by ${req.body.applier}!`
-      );
-      sendEmail(
-        arUser.email,
-        "New Request is Added that approved by head",
-        `This Request is Added by ${req.body.applier}!`
-      );
-      sendEmail(
-        req.body.applier,
-        "Request Approved by Head",
-        `Your request has been Approved by Head!`
-      );
+        await sendEmail(
+          req.body.applier,
+          "Request Approved by Head",
+          "Your request has been Approved by Head!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
     }
+    if (requestData.approveStatus === "driverAssigned") {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
 
-    // Respond with success message and updated request object
+        const deanUsers = await User.find({ designation: "dean" });
+
+        for (const user of arUsers) {
+          await sendEmail(
+            user.email,
+            "New Request Approved by Checker",
+            `This Request is added by ${req.body.applier}!`
+          );
+        }
+
+        await sendEmail(
+          req.body.applier,
+          "Request Approved by Checker",
+          "Your request has been Approved by Checker!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
+    }
+if (requestData.approveStatus === "arApproved"||requestData.distance>40) {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
+
+        const deanUsers = await User.find({ designation: "dean" });
+
+    
+        for (const user of deanUsers) {
+          await sendEmail(
+            user.email,
+            "New Request Approved by AR",
+            `This Request is added by ${req.body.applier}!`
+          );
+        }
+
+        await sendEmail(
+          req.body.applier,
+          "Request Approved by Checker",
+          "Your request has been Approved by Checker!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
+    }
+    if (requestData.approveStatus === "arApproved"||requestData.distance<40) {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
+
+        const deanUsers = await User.find({ designation: "dean" });
+
+
+        await sendEmail(
+          req.body.applier,
+          "Request is Approved",
+          "Your request has been Approved by AR!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
+    }
+    if (requestData.approveStatus === "deanApproved") {
+      try {
+        const arUsers = await User.find({ designation: "ar" });
+        const checkerUsers = await User.find({ designation: "checker" });
+
+        const deanUsers = await User.find({ designation: "dean" });
+
+        await sendEmail(
+          req.body.applier,
+          "Request Approved by Dean",
+          "Your request has been Approved by Dean!"
+        );
+      } catch (emailErr) {
+        console.error("Error sending head approval emails:", emailErr);
+      }
+    }
+   
     res.json({ status: "ok", updatedRequest: existingRequest });
   } catch (error) {
     console.error("Error occurred: ", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+  
 });
-router.delete('/requests/:id', async (req, res) => {
+
+router.delete("/requests/:id", async (req, res) => {
   const { id } = req.params;
   try {
-      const deletedRequest = await Request.findByIdAndDelete(id);
-      if (!deletedRequest) {
-          return res.status(404).json({ message: 'Request not found' });
-      }
-      res.json({ message: 'Request deleted successfully', deletedRequest });
+    const deletedRequest = await Request.findByIdAndDelete(id);
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    res.json({ message: "Request deleted successfully", deletedRequest });
   } catch (error) {
-      res.status(500).json({ message: 'Error deleting request', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting request", error: error.message });
   }
 });
 router.get("/getPassengers", auth, async (req, res) => {
