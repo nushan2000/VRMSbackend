@@ -10,10 +10,23 @@ const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 const User = require("../model/User");
 //const emailService = new EmailService();
 //const Tellio = require('twilio');
 // Add a new request
+
+// Setup multer (memory storage or disk storage based on your needs)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "documents"); // folder must exist or be created beforehand
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
 const transporter = nodemailer.createTransport({
   service: "gmail", // Use your email provider (e.g., Gmail, Outlook, SMTP)
@@ -41,17 +54,17 @@ const sendEmail = (to, subject, message) => {
   });
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Make sure 'uploads' folder exists
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/"); // Make sure 'uploads' folder exists
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+//     cb(null, uniqueSuffix + path.extname(file.originalname));
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
   try {
@@ -74,6 +87,7 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       passengers,
       applier,
       applyDate,
+      documentUrls,
     } = req.body;
 
     // Parse passengers after receiving it as a string
@@ -139,8 +153,10 @@ router.post("/addrequest", upload.single("file"), auth, async (req, res) => {
       applier,
       applyDate,
       driverStatus: "notStart",
-      filePath: uploadedFile?.path || null,
+      documentUrls,
+      // filePath: uploadedFile?.path || null
     });
+    console.log(newRequest);
 
     // Save the request to MongoDB
     const savedRequest = await newRequest.save();
@@ -220,80 +236,76 @@ router.get("/viewRequest/:id", auth, async (req, res) => {
 router.get("/RequestVehicles/:date", async (req, res) => {
   try {
     const requestDate = req.params.date;
-    // console.log("date", requestDate);
+
+    // If date is not provided or invalid
+    if (!requestDate) {
+      return res.status(400).json({ error: "Date parameter is required." });
+    }
+
+    // Find approved requests for the date
     const requests = await Request.find({
       date: requestDate,
       approveDeenAr: true,
     });
-    //console.log("reqes", requests);
 
+    if (!requests || requests.length === 0) {
+      console.log("No requests found for the given date.");
+    }
+
+    // Fetch all vehicles
     const allVehicles = await Vehicle.find();
-    //console.log("all",allVehicles);
 
+    if (!allVehicles || allVehicles.length === 0) {
+      return res.status(404).json({ error: "No vehicles found in the system." });
+    }
+
+    // Group passengers by vehicle ID
     const groupedData = requests.reduce((acc, request) => {
-      const vehicleName = request.vehicle;
-      const passengerCount = request.passengers.length;
+      const vehicleId = request?.vehicle?.toString(); // ensure it's a string
+      const passengerCount = Array.isArray(request?.passengers)
+        ? request.passengers.length
+        : 0;
 
-      if (!acc[vehicleName]) {
-        acc[vehicleName] = {
-          vehicleName,
+      if (!vehicleId) return acc;
+
+      if (!acc[vehicleId]) {
+        acc[vehicleId] = {
+          vehicleId,
           totalPassengers: 0,
         };
       }
 
-      acc[vehicleName].totalPassengers += passengerCount;
+      acc[vehicleId].totalPassengers += passengerCount;
       return acc;
     }, {});
 
-    const groupedArray = Object.values(groupedData);
-    //console.log("array group", groupedArray);
+    // Convert to array
+    const groupedArray = Object.values(groupedData || {});
 
-    const vehicleNames = groupedArray.map((v) => v.vehicleName);
-    //console.log("vehicle name",vehicleNames);
-
-    const vehicles = await Vehicle.find({ _id: { $in: vehicleNames } });
-    // console.log("id",vehicles._id);
-
-    // const finalDat = groupedArray.map(group => {
-    //     const vehicle = vehicles.find(v => v.vehicleName === group.vehicleName);
-    //     return {
-    //         vehicleName: group.vehicleName,
-    //         totalPassengers: group.totalPassengers,
-    //         maxCapacity: vehicle ? vehicle.sheatCapacity : "Unknown", // Use sheatCapacity from Vehicle
-    //         availableSeats: vehicle
-    //             ? vehicle.sheatCapacity - group.totalPassengers
-    //             : "Unknown", // Calculate available seats
-    //         status: vehicle ? vehicle.status : "Unknown", // Include vehicle status
-    //         availability: vehicle ? vehicle.availability : "Unknown", // Include availability
-    //     };
-    // });
+    // Final output: loop through all vehicles and attach passenger counts
     const finalData = allVehicles.map((vehicle) => {
-      //console.log("ingroup",vehicle);
-
-      // Find the matching grouped data for this vehicle
-      const grouped = groupedArray.find(
-        (g) => g.vehicleName === vehicle._id.toString()
-      );
-      //console.log("group", grouped);
+      const vehicleId = vehicle?._id?.toString();
+      const grouped = groupedArray.find((g) => g.vehicleId === vehicleId);
 
       return {
-        id: vehicle._id,
-        vehicleName: vehicle.vehicleName,
-        totalPassengers: grouped ? grouped.totalPassengers : 0,
-        maxCapacity: vehicle.sheatCapacity, // Use sheatCapacity from Vehicle
+        id: vehicleId,
+        vehicleName: vehicle?.vehicleName || "Unknown",
+        totalPassengers: grouped?.totalPassengers || 0,
+        maxCapacity: vehicle?.sheatCapacity || 0,
         availableSeats:
-          vehicle.sheatCapacity - (grouped ? grouped.totalPassengers : 0),
-        status: vehicle.status, // Include vehicle status
-        availability: vehicle.availability, // Include availability
+          (vehicle?.sheatCapacity || 0) - (grouped?.totalPassengers || 0),
+        status: vehicle?.status || "Unknown",
+        availability: vehicle?.availability || "Unknown",
       };
     });
 
     res.json(finalData);
   } catch (err) {
-    //console.error("Error fetching requests: ", err);
+    console.error("Error fetching requests: ", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Update a request by ID
 router.put("/updateRequest1/:id", auth, async (req, res) => {
@@ -391,14 +403,16 @@ router.put("/updateRequest1/:id", auth, async (req, res) => {
         console.error("Error sending head approval emails:", emailErr);
       }
     }
-if (requestData.approveStatus === "arApproved"||requestData.distance>40) {
+    if (
+      requestData.approveStatus === "arApproved" ||
+      requestData.distance > 40
+    ) {
       try {
         const arUsers = await User.find({ designation: "ar" });
         const checkerUsers = await User.find({ designation: "checker" });
 
         const deanUsers = await User.find({ designation: "dean" });
 
-    
         for (const user of deanUsers) {
           await sendEmail(
             user.email,
@@ -416,13 +430,15 @@ if (requestData.approveStatus === "arApproved"||requestData.distance>40) {
         console.error("Error sending head approval emails:", emailErr);
       }
     }
-    if (requestData.approveStatus === "arApproved"||requestData.distance<40) {
+    if (
+      requestData.approveStatus === "arApproved" ||
+      requestData.distance < 40
+    ) {
       try {
         const arUsers = await User.find({ designation: "ar" });
         const checkerUsers = await User.find({ designation: "checker" });
 
         const deanUsers = await User.find({ designation: "dean" });
-
 
         await sendEmail(
           req.body.applier,
@@ -449,13 +465,12 @@ if (requestData.approveStatus === "arApproved"||requestData.distance>40) {
         console.error("Error sending head approval emails:", emailErr);
       }
     }
-   
+
     res.json({ status: "ok", updatedRequest: existingRequest });
   } catch (error) {
     console.error("Error occurred: ", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-  
 });
 
 router.delete("/requests/:id", async (req, res) => {
@@ -612,5 +627,67 @@ const sendNotification = async (
     return { success: false, error: error.message };
   }
 };
+
+router.post(
+  "/upload-document",
+  auth,
+  upload.single("document"),
+  async (req, res) => {
+    try {
+      const documentUrl = req.file.filename;
+      console.log("successUP");
+      res
+        .status(200)
+        .json({
+          success: true,
+          message: "Document uploaded successfully",
+          data: { documentUrl },
+        });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
+
+router.get("/get-document/:documentUrl", auth, async (req, res) => {
+  try {
+    const documentUrl = req.params.documentUrl;
+    const filePath = path.join(__dirname, "../documents", documentUrl);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Option 1: Download the file
+    res.download(filePath); // prompts download in browser
+
+    // Option 2: Just send the file for viewing (like PDF/image in browser)
+    //res.sendFile(filePath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/delete-document/:documentUrl", auth, async (req, res) => {
+  try {
+    const documentUrl = req.params.documentUrl;
+    const filePath = path.join(__dirname, "../documents", documentUrl);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Delete the file
+    fs.unlinkSync(filePath);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Document deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

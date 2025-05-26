@@ -1,12 +1,33 @@
-FROM node
+# FROM node
 
+# WORKDIR /app
+
+# COPY package.json .
+
+# RUN npm install
+
+# COPY . .
+# EXPOSE 8080
+
+# CMD ["npm" , "start"]
+
+# Base image
+FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
 
-COPY package.json .
+# Copy package files
+COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
+# Copy application source code
 COPY . .
+
+# Expose the port your app uses
 EXPOSE 8080
 
-CMD ["npm" , "start"]
+# Run your application
+CMD ["node", "server.js"]
