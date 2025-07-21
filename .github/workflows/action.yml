@@ -24,7 +24,7 @@ jobs:
     - name: SSH and deploy on VPS
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: 10.50.227.121
+        host: 192.248.50.253
         username: vrsuser
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
