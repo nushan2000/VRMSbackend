@@ -118,8 +118,8 @@
     "yallist": "^4.0.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node init && node server.js",
+    "dev": "node init && nodemon server.js"
   },
   "author": "Ariyarathna PGRVD,Abeydeera APPS,Ediriwickrama EANH,Ketawala MH",
   "license": "ISC",
